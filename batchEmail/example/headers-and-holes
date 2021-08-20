@@ -1,0 +1,27 @@
+# comment: one mail one block.
+
+{
+from: yashyu@senpai.com
+to: person1@gmail.com
+cc:
+bcc:
+subject: Renting
+
+# extra keys are for holes in the template.
+myname: Ailrk
+palce: #123 Rocket road, Republic of Doge, Mars
+time: 2rd May, 2100
+}
+
+# very good location at mars.
+{
+from: yashyu@senpai.com
+to: person2@gmail.com
+cc:
+bcc:
+subject: Renting
+
+myname: Ailrk
+palce: #77 Rocket road, Republic of Doge, Mars
+time: 3rd May, 2100
+}
