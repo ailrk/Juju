@@ -52,6 +52,7 @@ data MailThunk (status :: Status) =
             , mtcontent :: MailThunkContent status
             }
 
+
 -- parseTemplate :: T.Text -> [Chunk]
 parseTemplate :: T.Text -> [Chunk]
 parseTemplate template
@@ -94,6 +95,11 @@ fillHoles chunks holeMap = T.toLazyText (foldr fill mempty chunks)
 
 makeMails :: [Chunk] -> [HeaderAndHole] -> [MailThunk Filled]
 makeMails template mts = undefined
+  where
+    makeMail :: (MailThunk Unfilled, [(T.Text, T.Text)]) -> MailThunk Filled
+    makeMail (MailThunk{..}, holeMap) =
+      let filled = fillHoles template holeMap
+          in MailThunk {mtcontent = filled, ..}
 
 sendIt :: FilePath -> FilePath -> FilePath -> MailThunk Filled -> IO ()
 sendIt host user pass MailThunk{..} = do
