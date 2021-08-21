@@ -17,20 +17,25 @@ module Main where
 import           Control.Monad
 import           Data.Data
 import           Data.Default
-import           Data.Foldable          (traverse_)
+import           Data.Foldable               (traverse_)
 import           Data.Function
-import           Data.Maybe             (fromJust)
-import qualified Data.Text.Encoding     as T
-import qualified Data.Text.Lazy         as T
-import qualified Data.Text.Lazy.Builder as T
-import qualified Data.Text.Lazy.IO      as T
+import           Data.Maybe                  (fromJust)
+import qualified Data.Text                   as T
+import qualified Data.Text.Encoding          as T
+import qualified Data.Text.IO                as T
+import qualified Data.Text.Lazy              as TL
+-- import qualified Data.Text.Lazy.Builder      as T
+import qualified Data.Text.Lazy.IO           as TL
 import           Debug.Trace
 import           GHC.Records
 
-import qualified Data.Text              as TL
-import           GHC.Base               (assert)
-import           Network.Mail.Mime      hiding (simpleMail)
-import           Network.Mail.SMTP
+-- import qualified Data.Text                   as TL
+import           GHC.Base                    (assert)
+import           Network.HaskellNet.Auth
+import           Network.HaskellNet.SMTP
+import           Network.HaskellNet.SMTP.SSL
+import           Network.Mail.Mime
+
 import           System.Environment
 import           System.Exit
 import           Text.Pretty.Simple
@@ -43,34 +48,34 @@ chunkToText (SomeText n) = Just n
 chunkToText (Key _)      = Nothing
 
 type family MailThunkContent a where
-  MailThunkContent Filled = T.Text
+  MailThunkContent Filled = TL.Text
   MailThunkContent Unfilled = ()
 
 data MailThunk (status :: Status) =
   MailThunk { mtfrom    :: Address
-            , mtto      :: [Address]
-            , mtcc      :: [Address]
-            , mtbcc     :: [Address]
+            , mtto      :: Address
+            , mtcc      :: Address
+            , mtbcc     :: Address
             , mtsubject :: T.Text
             , mtcontent :: MailThunkContent status
             }
 
 instance Default (MailThunk Unfilled) where
-  def = MailThunk { mtfrom = "", mtto = [] , mtcc = []
-                  , mtbcc = [], mtsubject = "", mtcontent = () }
+  def = MailThunk { mtfrom = "", mtto = "" , mtcc = ""
+                  , mtbcc = "", mtsubject = "", mtcontent = () }
 
 -- | parse one template file as list of chunks. key is trimed.
-parseTemplate :: T.Text -> Maybe [Chunk]
+parseTemplate :: TL.Text -> Maybe [Chunk]
 parseTemplate template
-  | T.null template = return []
-  | otherwise = return $ template & T.splitOn "{@" & foldr convert [] & fixLast
+  | TL.null template = return []
+  | otherwise = return $ template & TL.splitOn "{@" & foldr convert [] & fixLast
   where
     convert s acc
-      | let (pre, rest) = T.breakOnEnd "@}" s, not (T.null rest) =
-        let pre' = Key $ T.strip (T.take (T.length pre - 2) pre)
-            rest' = SomeText rest
+      | let (pre, rest) = TL.breakOnEnd "@}" s, not (TL.null rest) =
+        let pre' = Key $ TL.toStrict (TL.strip (TL.take (TL.length pre - 2) pre))
+            rest' = SomeText (TL.toStrict rest)
         in pre' : rest' : acc
-      | otherwise = SomeText s : acc
+      | otherwise = SomeText (TL.toStrict s) : acc
     fixLast xs = let pre = init xs
                      l = last xs
                   in case l of
@@ -94,17 +99,17 @@ parseBlock text = do
     convert s acc@(mt, holeMap)
       | let (key, value) = s, not . T.null . T.strip $ value =
         let updateMailThunk =
-              let value' = TL.strip . TL.tail . T.toStrict $ value
+              let value' = T.strip . T.tail $ value
                   addr = Address Nothing  value' in
               case key of
                 "from"    -> mt { mtfrom = addr }
-                "to"      -> mt { mtto = addr : mtto mt }
-                "cc"      -> mt { mtcc = addr : mtcc mt }
-                "bcc"     -> mt { mtbcc = addr : mtbcc mt }
-                "subject" -> mt { mtsubject = T.fromChunks [value'] }
+                "to"      -> mt { mtto = addr }
+                "cc"      -> mt { mtcc = addr }
+                "bcc"     -> mt { mtbcc = addr }
+                "subject" -> mt { mtsubject = value' }
                 _         -> mt
             updateHoleMap = if not (key `elem` keywords)
-                               then (key, T.tail value) : holeMap
+                               then (key, T.strip . T.tail $ value) : holeMap
                                else holeMap
          in (updateMailThunk, updateHoleMap)
       | otherwise = acc
@@ -119,18 +124,18 @@ parseHeadersAndHoles text
             & filter (not . T.null)
      in trace ("[ts]: " ++ show ts) $ traverse parseBlock ts
 
-fillHoles :: [Chunk] -> [(T.Text, T.Text)] -> T.Text
-fillHoles chunks holeMap = trace ("[FILLHOLD]: " ++ show holeMap) $ T.toLazyText (foldr fill mempty chunks)
+fillHoles :: [Chunk] -> [(T.Text, T.Text)] -> TL.Text
+fillHoles chunks holeMap = foldr fill mempty chunks
   where
-    fill (SomeText t) acc = T.fromLazyText t <> acc
+    fill (SomeText t) acc = TL.fromStrict t <> acc
     fill (Key k) acc =
-      case T.fromLazyText <$> lookup k holeMap of
-        Just n  -> n <> acc
+      case lookup k holeMap of
+        Just n  -> TL.fromStrict n <> acc
         Nothing -> acc
 
 filledMt2Mail :: MailThunk Filled -> Mail
 filledMt2Mail MailThunk{..} =
-  simpleMail mtfrom mtto mtcc mtbcc (T.toStrict mtsubject) [plainPart mtcontent]
+  simpleMail' mtto mtfrom mtsubject mtcontent
 
 makeMail :: [Chunk] -> HeaderAndHole -> Mail
 makeMail templateChunk hh = filledMt2Mail (makeMailThunk hh)
@@ -141,22 +146,28 @@ makeMail templateChunk hh = filledMt2Mail (makeMailThunk hh)
        in trace ("[FILLED]: " ++ show filled) $ MailThunk {mtcontent = filled, ..}
 
 sendIt :: FilePath -> FilePath -> FilePath -> Mail -> IO ()
-sendIt host user pass mail = do
-  pPrint mail
-  sendMailWithLogin host user pass mail
+sendIt host user pass mail = doSMTPSTARTTLS host $ \conn -> do
+  authSuccess <- authenticate LOGIN user pass conn
+  if authSuccess
+     then sendMail mail conn
+     else die "authentication failed"
 
-main :: IO ()
-main = do
-  [template, infos, host, user, pass] <- getArgs
+  -- pPrint mail
 
+run :: String -> String -> String -> String -> String -> IO ()
+run template hhs host user pass = do
   template <- fromJust <$> do
-    t <- T.readFile template
+    t <- TL.readFile template
     return $ parseTemplate t
 
   hhs <- fromJust <$> do
-    i <- T.readFile infos
+    i <- T.readFile hhs
     return $ parseHeadersAndHoles i
 
   let mails =  makeMail template <$> hhs
-  -- traverse_ (\n -> putStrLn (show $ "[MAIL:]" <> show n <> show "\n") >> putStrLn "")  mails
   traverse_ (sendIt host user pass) mails
+
+main :: IO ()
+main = do
+  [template, hhs, host, user, pass] <- getArgs
+  run template hhs host user pass

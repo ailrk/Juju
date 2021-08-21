@@ -10,7 +10,7 @@ subject: Renting
 # extra keys are for holes in the template.
 
 myname: Ailrk
-palce: 123 Rocket road, Republic of Doge, Mars
+place: 123 Rocket road, Republic of Doge, Mars
 time: 2rd May, 2100
 }
 
@@ -23,6 +23,6 @@ bcc:
 subject: Renting
 
 myname: Ailrk
-palce: 77 Rocket road, Republic of Doge, Mars
+place: 77 Rocket road, Republic of Doge, Mars
 time: 3rd May, 2100
 }
