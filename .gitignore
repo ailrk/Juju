@@ -422,3 +422,5 @@ setup.ml
 
 # exclude data files
 *data-only*
+
+*.prof
