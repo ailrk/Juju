@@ -33,6 +33,7 @@ import           Network.Mail.Mime      hiding (simpleMail)
 import           Network.Mail.SMTP
 import           System.Environment
 import           System.Exit
+import           Text.Pretty.Simple
 
 data Status = Unfilled | Filled
 data Chunk = SomeText T.Text | Key T.Text deriving Show
@@ -93,15 +94,16 @@ parseBlock text = do
     convert s acc@(mt, holeMap)
       | let (key, value) = s, not . T.null . T.strip $ value =
         let updateMailThunk =
-              let addr = Address Nothing (TL.strip . T.toStrict $ value) in
+              let value' = TL.strip . TL.tail . T.toStrict $ value
+                  addr = Address Nothing  value' in
               case key of
                 "from"    -> mt { mtfrom = addr }
                 "to"      -> mt { mtto = addr : mtto mt }
                 "cc"      -> mt { mtcc = addr : mtcc mt }
                 "bcc"     -> mt { mtbcc = addr : mtbcc mt }
-                "subject" -> mt { mtsubject = value }
+                "subject" -> mt { mtsubject = T.fromChunks [value'] }
                 _         -> mt
-            updateHoleMap = if key `elem` keywords
+            updateHoleMap = if not (key `elem` keywords)
                                then (key, T.tail value) : holeMap
                                else holeMap
          in (updateMailThunk, updateHoleMap)
@@ -109,21 +111,20 @@ parseBlock text = do
 
 type HeaderAndHole = (MailThunk Unfilled, [(T.Text, T.Text)])
 
--- TODO
 parseHeadersAndHoles :: T.Text -> Maybe [HeaderAndHole]
 parseHeadersAndHoles text
   | T.null text = return $ []
   | otherwise =
     let ts = T.dropEnd 1 . fst . T.breakOnEnd "}" <$> (T.splitOn "{" text)
             & filter (not . T.null)
-     in trace ("[ts]: " ++ show ts ++ show "\n") $ traverse parseBlock ts
+     in trace ("[ts]: " ++ show ts) $ traverse parseBlock ts
 
 fillHoles :: [Chunk] -> [(T.Text, T.Text)] -> T.Text
-fillHoles chunks holeMap = T.toLazyText (foldr fill mempty chunks)
+fillHoles chunks holeMap = trace ("[FILLHOLD]: " ++ show holeMap) $ T.toLazyText (foldr fill mempty chunks)
   where
     fill (SomeText t) acc = T.fromLazyText t <> acc
     fill (Key k) acc =
-      case lookup k holeMap >>= \n -> return $ T.fromLazyText n of
+      case T.fromLazyText <$> lookup k holeMap of
         Just n  -> n <> acc
         Nothing -> acc
 
@@ -132,17 +133,17 @@ filledMt2Mail MailThunk{..} =
   simpleMail mtfrom mtto mtcc mtbcc (T.toStrict mtsubject) [plainPart mtcontent]
 
 makeMail :: [Chunk] -> HeaderAndHole -> Mail
-makeMail templateChunk hh = let d'1 = filledMt2Mail (makeMailThunk hh)
-                             in trace ("hihi" <> show d'1) $ d'1
+makeMail templateChunk hh = filledMt2Mail (makeMailThunk hh)
   where
     makeMailThunk :: HeaderAndHole -> MailThunk Filled
     makeMailThunk (MailThunk{..}, holeMap) =
-      trace (show "makeMailThunk" <> show holeMap) $
       let filled = fillHoles templateChunk holeMap
-          in MailThunk {mtcontent = filled, ..}
+       in trace ("[FILLED]: " ++ show filled) $ MailThunk {mtcontent = filled, ..}
 
 sendIt :: FilePath -> FilePath -> FilePath -> Mail -> IO ()
-sendIt host user pass mail = sendMailWithLogin host user pass mail
+sendIt host user pass mail = do
+  pPrint mail
+  sendMailWithLogin host user pass mail
 
 main :: IO ()
 main = do
@@ -157,5 +158,5 @@ main = do
     return $ parseHeadersAndHoles i
 
   let mails =  makeMail template <$> hhs
-  traverse_ (\n -> putStrLn (show $ "[MAIL:]" ++ show n ++ show "\n") >> putStrLn "")  mails
+  -- traverse_ (\n -> putStrLn (show $ "[MAIL:]" <> show n <> show "\n") >> putStrLn "")  mails
   traverse_ (sendIt host user pass) mails
