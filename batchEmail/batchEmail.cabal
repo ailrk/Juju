@@ -20,3 +20,8 @@ executable batchEmail
       , data-default
 --    hs-source-dirs:   app
     default-language: Haskell2010
+    -- profiling
+    -- ghc-options:
+    --   -rtsopts
+    --   -prof
+    --   -fprof-auto

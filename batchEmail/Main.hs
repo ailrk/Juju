@@ -8,6 +8,7 @@
 {-# LANGUAGE TypeFamilies       #-}
 
 {-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Main where
 
 -- Eh, this library allows you to make a email but it doesn't export the mail
@@ -23,8 +24,11 @@ import qualified Data.Text.Encoding     as T
 import qualified Data.Text.Lazy         as T
 import qualified Data.Text.Lazy.Builder as T
 import qualified Data.Text.Lazy.IO      as T
+import           Debug.Trace
 import           GHC.Records
 
+import qualified Data.Text              as TL
+import           GHC.Base               (assert)
 import           Network.Mail.Mime      hiding (simpleMail)
 import           Network.Mail.SMTP
 import           System.Environment
@@ -54,7 +58,7 @@ instance Default (MailThunk Unfilled) where
   def = MailThunk { mtfrom = "", mtto = [] , mtcc = []
                   , mtbcc = [], mtsubject = "", mtcontent = () }
 
--- parseTemplate :: T.Text -> [Chunk]
+-- | parse one template file as list of chunks. key is trimed.
 parseTemplate :: T.Text -> Maybe [Chunk]
 parseTemplate template
   | T.null template = return []
@@ -89,7 +93,7 @@ parseBlock text = do
     convert s acc@(mt, holeMap)
       | let (key, value) = s, not . T.null . T.strip $ value =
         let updateMailThunk =
-              let addr = Address Nothing (T.toStrict value) in
+              let addr = Address Nothing (TL.strip . T.toStrict $ value) in
               case key of
                 "from"    -> mt { mtfrom = addr }
                 "to"      -> mt { mtto = addr : mtto mt }
@@ -105,14 +109,14 @@ parseBlock text = do
 
 type HeaderAndHole = (MailThunk Unfilled, [(T.Text, T.Text)])
 
+-- TODO
 parseHeadersAndHoles :: T.Text -> Maybe [HeaderAndHole]
 parseHeadersAndHoles text
   | T.null text = return $ []
   | otherwise =
-    let blockStartp = (\n -> (not . T.null $ n) && T.head n == '{' )
-        ts = filter blockStartp (T.splitOn "{" text)
-        ts1 = T.dropEnd 1 . fst . T.breakOnEnd "}" <$> ts
-     in traverse parseBlock ts1
+    let ts = T.dropEnd 1 . fst . T.breakOnEnd "}" <$> (T.splitOn "{" text)
+            & filter (not . T.null)
+     in trace ("[ts]: " ++ show ts ++ show "\n") $ traverse parseBlock ts
 
 fillHoles :: [Chunk] -> [(T.Text, T.Text)] -> T.Text
 fillHoles chunks holeMap = T.toLazyText (foldr fill mempty chunks)
@@ -128,10 +132,12 @@ filledMt2Mail MailThunk{..} =
   simpleMail mtfrom mtto mtcc mtbcc (T.toStrict mtsubject) [plainPart mtcontent]
 
 makeMail :: [Chunk] -> HeaderAndHole -> Mail
-makeMail templateChunk hh = filledMt2Mail (makeMailThunk hh)
+makeMail templateChunk hh = let d'1 = filledMt2Mail (makeMailThunk hh)
+                             in trace ("hihi" <> show d'1) $ d'1
   where
     makeMailThunk :: HeaderAndHole -> MailThunk Filled
     makeMailThunk (MailThunk{..}, holeMap) =
+      trace (show "makeMailThunk" <> show holeMap) $
       let filled = fillHoles templateChunk holeMap
           in MailThunk {mtcontent = filled, ..}
 
@@ -141,6 +147,15 @@ sendIt host user pass mail = sendMailWithLogin host user pass mail
 main :: IO ()
 main = do
   [template, infos, host, user, pass] <- getArgs
-  template <- fromJust <$> parseTemplate <$> T.readFile template
-  mails <- fromJust <$> parseHeadersAndHoles <$> T.readFile infos
-  traverse_ (sendIt host user pass) (makeMail template <$> mails)
+
+  template <- fromJust <$> do
+    t <- T.readFile template
+    return $ parseTemplate t
+
+  hhs <- fromJust <$> do
+    i <- T.readFile infos
+    return $ parseHeadersAndHoles i
+
+  let mails =  makeMail template <$> hhs
+  traverse_ (\n -> putStrLn (show $ "[MAIL:]" ++ show n ++ show "\n") >> putStrLn "")  mails
+  traverse_ (sendIt host user pass) mails
