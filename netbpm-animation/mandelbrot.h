@@ -17,7 +17,7 @@ int find(double creal, double cimg, int n) {
   int i = 0;
   double zr = 0.0, zi = 0.0;
 
-  for (; i < n && zr * zr - zi * zi < 4.0; ++i) {
+  for (; i < n && zr * zr + zi * zi < 4.0; ++i) {
     double tmp = zr * zr - zi * zi + creal;
     zi = 2.0 * zr * zi + cimg;
     zr = tmp;
@@ -46,20 +46,20 @@ inline void draw() {
     std::ofstream fout(filename);
     fout << "P6" << std::endl;
     fout << width << " " << height << std::endl;
-    fout << "256" << std::endl;
+    fout << "255" << std::endl;
 
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        double creal = TO_REAL(x, width, min_r, max_r),
-               cimg = TO_IMG(y, height, min_i, max_i);
+        double creal = (x * ((max_r - min_r) / width) + min_r);
+        double cimg = (y * ((max_r - min_r) / width) + min_r);
 
         int n = find(creal, cimg, max_n);
-        int r = n % 256;
-        int g = n % 256;
-        int b = n % 256;
-        fout << r << " " << g << " " << b << " ";
+        char rgb[] = { (char)(n % 255), (char)(n % 255), (char)(n % 255)};
+
+        // P6 format store pixels in bytes.
+        fout.write(rgb, sizeof(rgb) / sizeof(rgb[0]));
+
       }
-      fout << std::endl;
     }
   }
 
