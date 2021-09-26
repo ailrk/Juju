@@ -25,6 +25,4 @@ executable batchEmail
       -rtsopts
       -prof
       -fprof-auto
-    other-modules:
-      Test
-
+    -- other-modules:

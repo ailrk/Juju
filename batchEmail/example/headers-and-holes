@@ -26,3 +26,15 @@ myname: Ailrk
 place: 77 Rocket road, Republic of Doge, Mars
 time: 3rd May, 2100
 }
+
+{
+from: jimmy123good@gmail.com
+to: testtest123good@gmail.com
+cc:
+bcc:
+subject: Renting
+
+myname: Ailrk
+place: 77 Rocket road, Republic of Doge, Mars
+time: 3rd May, 2100
+}
