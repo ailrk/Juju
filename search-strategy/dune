@@ -1,0 +1,6 @@
+(executable
+ (name main)
+ (modules ("iterative_depening"
+           "dfs"
+           "bfs"
+           "main")))

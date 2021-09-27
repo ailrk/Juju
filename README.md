@@ -1,1 +1,1 @@
-### A collection of scripts for being lazy
+### Good stuffs
