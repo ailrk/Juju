@@ -7,13 +7,14 @@ import qualified Control.Monad (ap)
 import           GHC.Generics  (Generic)
 
 {-@ Zipper for tree
-    Zipper for list is simple, but how does it work for a  tree?
-    For a list zipper, our element is a node, and the context is the
+    Zipper for list is simple, what about tree?
+    For a list zipper, the element is a node, and the context is the
     left hand side and the right hand size of the node. like this:
     x x x x _ x x x x
             ^
-    where ^ points to our focus. This is simple because a focus can only
-    have one possible predecessor and one successor.
+
+    where ^ points to our focus. A focus can only have one possible predecessor
+    and one successor.
 
     Now imagine a tree as an element and one hole cotext.
              a                          a
@@ -24,11 +25,12 @@ import           GHC.Generics  (Generic)
      / ^\     \           / ^ \          \
     x    x     x         x     x          x
 
-    where c is the current focus. How do we encode this as focus and
-    context?
+    where c is the current focus. How do we encode this as focus and context?
+
     c is the left child of b, and it has a sibling tree d.
     First, to get the full context, we must know the sibling d.
-    And because we want to access c's children, the entire c tree should be kept.
+    And because we want to access c's children, the entire c tree should be
+    kept.
 @-}
 
 data BinaryTree a = Leaf
@@ -59,6 +61,7 @@ instance Functor BinaryTree where
 --      x
 --     / \
 --    b   (l ...)
+
 data TreeDirection a = TreeLeft a (BinaryTree a)
                      | TreeRight a (BinaryTree a)
                      deriving Show
@@ -68,6 +71,7 @@ instance Functor TreeDirection where
   fmap f (TreeRight x t) = TreeLeft (f x) (fmap f t)
 
 type TreeDirections a = [TreeDirection a]
+
 -- you might wonder, if each tree direction only give you the parent node,
 -- how can you go up further?
 -- THe answer is a tree ziper doesn't only hold one tree direction, but a list of

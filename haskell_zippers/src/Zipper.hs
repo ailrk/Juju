@@ -237,37 +237,39 @@ start z = case moveLeft z of
 
 
 {-@ Zipper vs lens
-    Zipper and lens looks very similar, but there are good for
-    different use cases.
+    Both zipper and lens allows you to update a nested structur, which one is
+    better to use?
 
-    Lens allows you to compose lens together to access in nested
-    data structure, but it can only access the data it "points" to,
-    you can't not access the surrouding of the focus.
+    Well Zipper and Lens are at complete different level. Whether to include
+    lens or not is a serious serious problem, becasue it changes everything
+    about the language.
 
-    Zipper, on the other hand, gives you the ability to access the
-    surroudings. In the list zipper case, you can access what's before
-    and what's after. Lens doesn't allow you to do that.
+    :ens is way more complicated. Using zipper means importing a cute
+    little data structure with some useful functions you expect from a data
+    structure library. Importing lens means turn on template haskell, write
+    all your records in the funny _X way, etc. My laptop current has 8GB and
+    everytime a cabal update will crash it.
 
-    Again, a simple pointer beat all of these, you can pin on one exact
-    data with almost no overhead, and do arithmetic on that pointer to
-    access the surroundings. Of course if it's not an array but some other
-    more complicated data structures, the cost will be higher.
+    One thing I find very annoying about haskell ecosystem is there is no
+    defacto way of doing things, everybody do their own things. It's like c++.
+    But at least C++ has a mature community and stl, but haskell base is lack
+    of some fundamental dependencies that everything slightly useful relies on
+    external libraries. End rant.
 @-}
 
 {-@ Algebra of zipper
-    First we know algebraic data type is called algebraic because
-    you can do algebra to work out the size of the type.
+    We know algebraic data type is called algebraic because
+    you can do algebra to work out the cardinality of the type.
 
     - Maybe a -> Nothing | Just a -> 1 + a
     - Either Void a -> _ | Right a -> 0 + a, you can not have Left case.
     - (Void, a) -> 0 * a = 0, this type is not constructable.
       ...
 
-    So take a look at this
+    So
     - Either x (x, x)  ->  (x + (x * x))
       d/dx(x + (x * x))  = (1 + (2 * x))
       (1 + (2 * x)) -> Maybe (Bool, x)
-
 
     - (Either x x, Either x x) -> (x + x) * (x + x)
       d/dx (x + x) * (x + x) = 8x
@@ -276,8 +278,9 @@ start z = case moveLeft z of
     - (x, x, x) -> (x * x * x)
       d/dx (d^3) = 3x^2 -> (Maybe bool, x, x)
 
-    Enough. the point is everytime you differetiante the datatype you
-    get a thing that looks like a zipper.
+    The point is everytime you differetiante the datatype you
+    get a thing that looks like a zipper. So differentiate a type you get a
+    it's one hole context.
 
 @-}
 
