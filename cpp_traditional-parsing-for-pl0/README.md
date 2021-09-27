@@ -1,23 +1,38 @@
 # Parser Survey
 
-Parsers at it's core is just a big predicate, It's only mission is to verify if a given text is valid for a langauge, and to it's convinence, maybe, create an AST for you.
+Parsers, at it's core is just a big predicate. It's only mission is to verify if a given text is valid for a langauge, and to it's convinence, maybe, create an AST for you.
 
-Before writing a parser, the first thing to do is to have a clearly defined bnf. For a tool like yacc you're forced to write one anyway so it's not an issue. But when hand writing a parser, it's really painful to modify the entire parser in the middle of the process.
+Before writing a parser, the first thing to do is to have a clearly defined bnf. For a tool like yacc you're forced to write one anyway so it's not an issue. But when hand writing a parser, it's really painful to modify the entire parser in the middle of the process. With an finalized bnf at hand, everything is much easier to deal with.
 
-With an finalized bnf at hand, everything is much easier to deal with.
+Productioon rule for context free grammar itself is a domain specific langauge. Itself is a inductive definition, and interestingly, we can write a context free grammar in natural deduction style. This is an example langauge with paired parenthesis.
 
-We are dealing with context free grammar, which is pretty much
+```
+  S -> S S  | ( S ) | () | ε
+```
 
-##### Top down parser
+If we say `n S` means n is in language S, the above production rules can be written as:
+```
+                         s S
+  ------      ------    -------
+   () S        ε S       ( s )
+```
 
-Top down parsers build the ast with preorder traversal. It comprises a set of production rules, during parsing, it first try to parse the top level rule, then going down non terminals recursively until it hits teriminals. Thus the name `recursive descenet`.
+This looks exactly like how you define semantics.
+
+PS: The principle of inductive definition is a set of rules works on a set of cases. Once in action, given input matches on cases until hit some base case. Inductions like peano nuatrual numbers is simple as it only have two cases, but nothing stops us to have a system with like, 1000 cases, and that is what we have here.
+
+Paired parenthesis is the essense of context free grammar! To parse something like this, you need to be able to remember. When you hit a ) you need to know whether there were a ( parsed eariler. This is only possible with context free grammar. A regular langauge only supports repeatation linearly, paired parenthesis is way to fancy for it.
+
+#####  Top down parser
+
+Top down parsers build the ast with preorder traversal. During parsing, it first try to parse the top level rule, then going down non terminals recursively until it hits teriminals. Thus the name `recursive descenet`.
 
 A top down parser is easy to write, we can simply write each non terminal as a function, a function can call other non terminals, until a character parser is is hit. A top down parser can bascially be transliterated from this bnf direclty.
 ```
   S -> E                        void expr();
   E -> E + T                    void term1();
-  E -> E * T       ->           void term2();
-  E -> T                        // just match on characters.
+     | E * T       ->           void term2();
+     | T                        // just match on characters.
   T -> <number>
 ```
 
@@ -69,11 +84,11 @@ Good things: there is no recursion on LR parser, so no need to worry about memor
 ```
 
 ##### Parser combinator
-Is just a top down parser, really nothing special about it. But in haskell you have monadic and applcative interfaces to combine things so the final fuction `looks more like a production rule` but it isn't.
+Is just a top down parser, nothing special about it. In haskell you have monadic and applcative interfaces (well, just do notations and much of <*> <$> thingys) to combine things so the final fuction `looks like` a production rule but it isn't. You still pretty much need a bnf.
 
-Knowing a parser is a monad is not surprising at all, since everything is a monad anyway. But it's interesting to know correlations like applicative parser with context free grammar and monadic parser with context sensative grammar.
+A parser is a monad, it's not surprising at all, everything is a monad anyway. (Again not suprising that it parses context sensative grammar since within monad you're essentially writing unrestricted imperative code, just like how you're writing parser in, say, C).
 
-(Again not suprising since within monad you're essentially writing unrestricted imperative code, just like how you're writing parser in, say, C).
+But it is interesting to know correlations like applicative parser with context free grammar and monadic parser with context sensative grammar.
 
 ##### Best way to parse anything
 Is just to use a parser generator really...
