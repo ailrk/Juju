@@ -34,23 +34,12 @@
 
 (defparameter *fish-fight-graph*
   (init-hash-table
-    '((a . (b c))
-      (b . (a d))
-      (c . (a d))
-      (d . (b c e f))
-      (e . (d g h))
-      (f . (d g h))
-      (g . (f e))
-      (h . (f e)))))
+    '((a . (b c)) (b . (a d)) (c . (a d)) (d . (b c e f)) (e . (d g h))
+      (f . (d g h)) (g . (f e)) (h . (f e)))))
 
 (defparameter *bird-graph*
   (init-hash-table
-    '((a . (b c))
-      (b . (a f g))
-      (c . (a d))
-      (d . (e))
-      (e . (d f g))
-      (g . (b e))
+    '((a . (b c)) (b . (a f g)) (c . (a d)) (d . (e)) (e . (d f g)) (g . (b e))
       (f . (b e)))))
 
 ;; output

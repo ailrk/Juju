@@ -37,26 +37,13 @@
 ;; (a b e), (c d h) (f g)
 (defparameter *graph*
   (init-hash-table
-    '((a . (b))
-      (b . (e f c))
-      (c . (d g))
-      (d . (c h))
-      (e . (a f))
-      (f . (g))
-      (g . (f))
-      (h . (g d)))))
+    '((a . (b)) (b . (e f c)) (c . (d g)) (d . (c h)) (e . (a f)) (f . (g))
+      (g . (f)) (h . (g d)))))
 
 (defparameter *graph-1*
   (init-hash-table
-    '((3 . (0))
-      (0 . (1))
-      (1 . (2))
-      (2 . (3 4))
-      (4 . (5))
-      (5 . (6))
-      (6 . (4))
-      (7 . (8 6))
-      (8 . nil))))
+    '((3 . (0)) (0 . (1)) (1 . (2)) (2 . (3 4)) (4 . (5)) (5 . (6))
+      (6 . (4)) (7 . (8 6)) (8 . nil))))
 
 
 ;; if we do dfs on the graph above from a, we have
