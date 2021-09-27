@@ -23,7 +23,7 @@ A regular expression describes finite state machine. Our clock now is the token 
 A state machine is just a table. If we look at the transitio function, `δ: ∑ × Q → Q`, it's a table indexed by two values. One is the current symbol, and the other is the current state. More specifically, σ is just a simple mapping. There is no for loop, no blocks, nothing. It's a simple pure function that maps from a tuple of value to another value. So it's static, we can draw the definition of a transition funciton as a 2d table. The following is an example table for the regular expression `ab*(a|c)`.
 
 ```
-   0 1 2 3 4
+    0 1 2 3 4
   +------------ (state)
 a | 1 0 3 0 0
 b | 0 2 2 0 0   regex ab*(a|c)

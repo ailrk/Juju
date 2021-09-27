@@ -1,0 +1,68 @@
+cabal-version:      2.4
+name:               busy-beaver
+version:            0.1.0.0
+
+-- A short (one-line) description of the package.
+-- synopsis:
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+
+-- The license under which the package is released.
+-- license:
+author:             Jimmy
+maintainer:         jimmy123good@hotmail.com
+extra-source-files: CHANGELOG.md
+
+library
+    hs-source-dirs: src
+
+    exposed-modules:
+      TM
+      Beaver
+      Oracle
+      ANN
+      Data.Matrix
+
+
+    other-modules:
+      Data.Internal.Matrix
+      Data.Internal.Vector
+      Data.Internal.Volume
+
+    build-depends:
+        base ^>=4.14.1.0
+      , hmatrix
+      , array
+      , vector
+      , vector-sized
+      , containers
+      , text
+      , deepseq
+      , parallel
+      , transformers
+      , mtl
+    hs-source-dirs:   app
+    default-language: Haskell2010
+
+
+executable busy-beaver-exe
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+    --   TM
+    --   Beaver
+    --   Oracle
+    --   ANN
+    --   APrelude
+
+    build-depends:
+        base ^>=4.14.1.0
+      , busy-beaver
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
