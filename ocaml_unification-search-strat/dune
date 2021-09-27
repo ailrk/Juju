@@ -3,4 +3,6 @@
  (modules ("iterative_depening"
            "dfs"
            "bfs"
+           "unification"
+           "search_strat"
            "main")))

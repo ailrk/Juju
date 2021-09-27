@@ -6,6 +6,8 @@
 (* Monotonic logic:
  *)
 
-let () = print_endline "Hello, World!"
 
 
+module IterativeDepeningJug = struct
+  let solve = assert true
+end
