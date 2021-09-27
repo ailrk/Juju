@@ -4,7 +4,7 @@ Parsers, at it's core is just a big predicate. It's only mission is to verify if
 
 Before writing a parser, the first thing to do is to have a clearly defined bnf. For a tool like yacc you're forced to write one anyway so it's not an issue. But when hand writing a parser, it's really painful to modify the entire parser in the middle of the process. With an finalized bnf at hand, everything is much easier to deal with.
 
-Productioon rule for context free grammar itself is a domain specific langauge. Itself is a inductive definition, and interestingly, we can write a context free grammar in natural deduction style. This is an example langauge with paired parenthesis.
+Production rule for context free grammar itself is a domain specific langauge. It's a inductive definition, and interestingly, we can write it in a inductive definition style. This is an example langauge with paired parenthesis.
 
 ```
   S -> S S  | ( S ) | () | ε
@@ -17,11 +17,17 @@ If we say `n S` means n is in language S, the above production rules can be writ
    () S        ε S       ( s )
 ```
 
-This looks exactly like how you define semantics.
+This looks exactly like how you will define semantics for a langauge.
 
-PS: The principle of inductive definition is a set of rules works on a set of cases. Once in action, given input matches on cases until hit some base case. Inductions like peano nuatrual numbers is simple as it only have two cases, but nothing stops us to have a system with like, 1000 cases, and that is what we have here.
+The gist of inductive definition is a set of rules represents a set of cases which can refer to each others. To have a useful inductive definition, we also want all non terminal rules can eventually hit a base case, so the whatever inductive process (parsing? evaluating?) terminates. Inductions like peano nuatrual numbers is very simple as it only have two cases, but nothing stops us to have a system with like, 1000 cases, and that is what we have here.
 
-Paired parenthesis is the essense of context free grammar! To parse something like this, you need to be able to remember. When you hit a ) you need to know whether there were a ( parsed eariler. This is only possible with context free grammar. A regular langauge only supports repeatation linearly, paired parenthesis is way to fancy for it.
+A parser is inductively defined, so the parsing process is also somewhat resemble a program evaluation. Actually everything works with a recursive structure are like an interpreter in nature.
+
+Paired parenthesis is the essense of context free grammar! To parse something like this, you need to be able to remember. When you hit a ) you need to know whether there were a ( parsed eariler. This is only possible with context free grammar. A regular langauge only supports `linear repeatition`, paired parenthesis is way to fancy for it.
+
+One can prove some grammar is regular with pumping lemma, it bascially says if get a string in the language, you splits it in three parts `xyz`, then `xyyz`, `xyyyz`, ..., `xyⁿz` still in the language. This tells you regular langauge is about repeating the previous structure. To prove something is context free, you also use pumping lemma, but for context free langauge. Still, given a string, we now split it into `uvwxy`, then if `uvvwxxy`, `uvvvwxxxy`, ..., `uvⁿwxⁿy` still in the langauge, then it's context free. The parenthesis langauge is a good example for this: `()`, `(())`, `((()))`..., same pattern recursive at different part of the string. I like the name `pummping`, it's descriptive and short. Imagine how productive people will be if all technical terms are named like this.
+
+Context free grammar is just a concept on automaton theory, in order to write real parsers you also need to know related parsing algorithms. The thing about parsing algorithms is they are super irregular: there is no one universal algorithm to rule them all. You can have a parser parses everything but for a given text it can produce several possible parse tree, thus it's ambigious; you can have a parser that can't decide what rule to apply so it has to go ahead until it fails and then backtrack; you can have a parser that recurses on the same pattern and never halt; you can have a parser that have non of problems above but only parse a much smaller subset of context free grammar... Donald Knuth said case analysis and move around abstraction are two most important ability for a programmer, it's really true.
 
 #####  Top down parser
 
