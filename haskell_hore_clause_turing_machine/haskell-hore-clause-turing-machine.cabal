@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               dsl-sharing
+name:               haskell-hore-clause-turing-machine
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -23,7 +23,8 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:
-      Sharing
+      HoreClauseTMachine
+
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -34,7 +35,7 @@ library
     hs-source-dirs:   src
     default-language: Haskell2010
 
-executable dsl-sharing
+executable haskell-hore-clause-turing-machine
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
@@ -44,7 +45,7 @@ executable dsl-sharing
     -- other-extensions:
     build-depends:
         base ^>=4.14.1.0,
-        dsl-sharing
+        haskell-hore-clause-turing-machine
 
     hs-source-dirs:   app
     default-language: Haskell2010
