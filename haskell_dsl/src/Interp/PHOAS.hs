@@ -19,4 +19,3 @@ data Value
   = Vlit Integer
   | VFun (Value -> Value)
 
-

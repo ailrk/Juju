@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs          #-}
 {-# LANGUAGE KindSignatures #-}
 
 module FAlgebra where

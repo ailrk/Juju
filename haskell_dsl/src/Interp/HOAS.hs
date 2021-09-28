@@ -14,26 +14,20 @@ import           Prelude       hiding (succ)
 -}
 
 
--------------------------------------------------------------------------------
 -- HOAS representation
--------------------------------------------------------------------------------
 import           Control.Monad (ap)
 data Expr a where
   Con :: a -> Expr a
   Lam :: (Expr a -> Expr b) -> Expr (a -> b)
   App :: Expr (a -> b) -> Expr a -> Expr b
 
--------------------------------------------------------------------------------
 -- base line interpreter for HOAS
--------------------------------------------------------------------------------
 eval :: Expr a -> a
 eval (Con v)     = v
 eval (Lam f)     = \x -> eval (f (Con x))
 eval (App e1 e2) = (eval e1) (eval e2)
 
--------------------------------------------------------------------------------
 -- define some combinatorial logic with the new lambda calculus DSL.
--------------------------------------------------------------------------------
 i :: Expr (a -> a)
 i = Lam $ \x -> x
 
@@ -46,9 +40,7 @@ s = Lam $ \x -> Lam $ \y -> Lam $ \z -> App (App x z) (App y z)
 
 skk = App (App s k) k
 
--------------------------------------------------------------------------------
 -- Make the language monadic.
--------------------------------------------------------------------------------
 instance Functor Expr where
   fmap f x = Con . f $ eval x
 
@@ -60,9 +52,7 @@ instance Monad Expr where
   return = pure
   m >>= k = k . eval $ m
 
--------------------------------------------------------------------------------
 -- define some short hand for creating expressions.
--------------------------------------------------------------------------------
 class LC m where
   apply :: m (a -> b) -> m a -> m b
   lambda :: (m a -> m b) -> m (a -> b)
@@ -73,9 +63,7 @@ instance LC Expr where
   lambda = Lam
   val = Con
 
--------------------------------------------------------------------------------
 -- define church encoding with new dsl.
--------------------------------------------------------------------------------
 
 z :: Expr ((a -> b) -> a -> a)
 z = lambda . const . lambda $ id
@@ -101,6 +89,7 @@ pred =
       <*> (lambda $ \u -> x)
       <*> (lambda $ \u -> u)
 
+-- manually define some numbers
 n1 = succ <*> z
 n2 = succ <*> n1
 n3 = succ <*> n2

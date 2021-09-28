@@ -11,17 +11,12 @@ module Interp.FOAS where
 -}
 
 
--------------------------------------------------------------------------------
 -- FOAS representation
--------------------------------------------------------------------------------
 data Expr = Var Char
           | Lam Char Expr
           | Expr Expr
 
-
--------------------------------------------------------------------------------
 -- de brujin indicies
--------------------------------------------------------------------------------
 
 {- de brujin indices convert variable names to the distance from it's usage
     to it's first binder

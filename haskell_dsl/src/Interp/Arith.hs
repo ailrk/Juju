@@ -58,6 +58,14 @@ primaryp = (token "|" *> exprp <* token "|")
        <++ (token "(" *> exprp <* token ")")
        <++ (intp >>= return . Val)
 
+-- overloads for the syntax. this is a much cheaper way to get custom syntax
+-- without using template haskell.
+es :: Expr
+es = "1 + 2 + 3 * 4 * (5 + (- 6))"
+
+en :: Expr
+en = 1 + 2 + 3 * 4 * (5 + (- 6))
+
 -- >>> readP_to_S exprp "12 + 1 * 2"
 -- [(Add (Val 12) (Mul (Val 1) (Val 2)),"")]
 

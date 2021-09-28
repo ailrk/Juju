@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-missing-methods #-}
 module Sharing where
 
+
 tree1 :: (Eq a, Num a, Num b) => a -> b
 tree1 0 = 1
 tree1 a = tree1 (a - 1) + tree1 (a - 1)
