@@ -81,9 +81,10 @@ mux2 c (a, b) = Mux2 c (a, b)
 register :: a -> Signal a -> Signal a
 register d s = Register d s
 
+
 -- a problem with deep embedding is that we might ended up with infinite loops
 -- when evalutating the dsl into ast.
---
+
 -- Program written in the dsl sometimes needs some recursion. In shallow dsl that
 -- just means run some functions recursively.
 -- However, in deep embeded dsl it means the program will generate a subtree of the
@@ -92,8 +93,6 @@ register d s = Register d s
 -- solutions:
 -- 1. indicate loop as an explicit effect with monad.
 -- 2. observable sharing.
-
-
 
 -- the interaction between the host language and the edsl.
 -- 1. the host language can serve as a macro langauge to generate edsl.

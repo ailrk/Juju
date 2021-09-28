@@ -96,5 +96,35 @@ A parser is a monad, it's not surprising at all, everything is a monad anyway. (
 
 But it is interesting to know correlations like applicative parser with context free grammar and monadic parser with context sensative grammar.
 
+A simple parser for parsing arithmetic expression with `Text.ParserCombinator.ReadP`. There are several things to note here.
+1. In real parse we need to explicitly deal with white spaces. A common way of handling it is to deliminate each clause with `skipSpaces`. This way all parsers parse the content first then skip trailing spaces, and once they compose white spaces are handled automatically.
+2. We need to build an AST from what we parsed, the parser code is more clutter.
+3. Function invokes left to right, so are parsers. For the rule `T -> F | F * F`, because the first thing we parse is always a `F`, if we parse `F` first we will never parse any term in form `F * F`. so for a given production rule, we want to parse the most complicated term first. The order matters.
+
+```haskell
+{- E -> T | T + T | T - T
+   T -> F | F * F | F / F
+   F -> P | + F | - F
+   P -> <int> | '(' E ')'
+-}
+
+data Expr = Add Expr Exr | Sub Expr Expr
+    | Neg Expr | Mul Expr Expr | Div Expr Expr | Val Int
+
+token n = string n <* skipSpaces
+intp :: ReadP Integer
+intp = (munch1 isDigit >>= (return . read)) <* skipSpaces
+
+exprp = (Add <$> termp <* token "+" <*> termp)
+    <++ (Sub <$> termp <* token "-" <*> termp)
+    <++ termp
+termp = (Mul <$> factorp <* token "*" <*> factorp)
+        (Div <$> factorp <* token "/" <*> factorp)
+    <++ factorp
+factorp = (Neg <$> (token "-" *> primaryp))
+      <++ (token "+" *> primaryp) <++ primaryp
+primaryp = (token "(" *> exprp <* token ")") <++ (intp >>= return . Val)
+```
+
 ##### Best way to parse anything
 Is just to use a parser generator really...
