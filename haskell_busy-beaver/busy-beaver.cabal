@@ -47,22 +47,3 @@ library
       , mtl
     hs-source-dirs:   app
     default-language: Haskell2010
-
-
-executable busy-beaver-exe
-    main-is:          Main.hs
-
-    -- Modules included in this executable, other than Main.
-    -- other-modules:
-    --   TM
-    --   Beaver
-    --   Oracle
-    --   ANN
-    --   APrelude
-
-    build-depends:
-        base ^>=4.14.1.0
-      , busy-beaver
-
-    hs-source-dirs:   app
-    default-language: Haskell2010

@@ -1,0 +1,1 @@
+let main = assert false

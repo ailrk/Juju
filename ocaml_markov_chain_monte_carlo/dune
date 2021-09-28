@@ -1,0 +1,7 @@
+(executable
+ (name main)
+ (modules ("main"
+           "mcmc"
+           "gen_text"
+           "metropolis"
+           "ppm")))

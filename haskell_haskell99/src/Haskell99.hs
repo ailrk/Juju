@@ -1,4 +1,4 @@
-module MiniProject.Haskell99 where
+module Haskell99 where
 
 import           Data.Foldable
 import           Data.List
