@@ -1,29 +1,38 @@
-{-# LANGUAGE AllowAmbiguousTypes    #-}
-{-# LANGUAGE DataKinds              #-}
-{-# LANGUAGE FlexibleInstances      #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE GADTs                  #-}
-{-# LANGUAGE PolyKinds              #-}
-{-# LANGUAGE RankNTypes             #-}
-{-# LANGUAGE ScopedTypeVariables    #-}
-{-# LANGUAGE TypeApplications       #-}
-{-# LANGUAGE TypeFamilies           #-}
-{-# LANGUAGE FlexibleContexts       #-}
-{-# LANGUAGE TypeOperators          #-}
+{-# LANGUAGE AllowAmbiguousTypes      #-}
+{-# LANGUAGE DataKinds                #-}
+{-# LANGUAGE FlexibleContexts         #-}
+{-# LANGUAGE FlexibleInstances        #-}
+{-# LANGUAGE FunctionalDependencies   #-}
+{-# LANGUAGE GADTs                    #-}
+{-# LANGUAGE PolyKinds                #-}
+{-# LANGUAGE RankNTypes               #-}
+{-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
+{-# LANGUAGE TypeApplications         #-}
+{-# LANGUAGE TypeFamilies             #-}
+{-# LANGUAGE TypeOperators            #-}
 
 module Reflection where
 
 import           Data.Kind
 import           Data.Proxy
 
-import Foreign.C.Types
-import Foreign.Storable
+import           Foreign.C.Types
+import           Foreign.Storable
 
 -- http://okmij.org/ftp/Haskell/tr-15-04.pdf
 
 ----- threaded modulus --------------------------------------------------------
--- this makes sure all modulo passed are correct.
+{-
+   we can use phantom type to propagate thead within a scope. This technique is
+   used to ensure STRef doesn't escape runST
+
+   Here we can use the same idea, propagating a type s that encodes the
+   configuration value to all sub computation. This requires us to encode value
+   into  a type.
+
+   Later when we want to find a way to reify the type to value when we need to.
+-}
 
 newtype M s a = M a deriving (Eq, Show)
 
@@ -40,10 +49,7 @@ unM (M m) =  m
 class Modular s a | s -> a where     -- map type s to a
   modulus :: forall s . a
 
--- example of a specific instance for modular typeclass
--- if we know s statically we can just know what value modulus should be.
 data Label_S_3
-
 instance Modular Label_S_3 Int where modulus = 3
 
 -- >>> modulus @Label_S_3
@@ -54,6 +60,7 @@ normalize a = M $ a `mod` (modulus @s)
 
 -- normalize propagates type info. Here we're saying: in context of Label_S_3
 -- and a being Int, 10 is equivalent to 1
+
 -- >>> normalize @Label_S_3 @Int 10
 -- M 1
 
@@ -85,14 +92,17 @@ data Suc' s
 data Pred' s
 data Twice' s
 
--- ReflectNum reflect a Nat type to value.
--- It uses allow ambiguous types because reflectNum has no parameter, so we
--- must annotate the type to let ghc knows what value to have.
--- It's essentially a function that takes two type parameters s and a and
--- reutrn a value of Num a.
--- To use the functoin, we apply the function with types using "TypeApplication"
--- so reflect @Zero'.
--- This essentially project Zero' on type level to 0 on term level.
+{-
+   ReflectNum reflect a Nat type to value.
+   It uses allow ambiguous types because reflectNum has no parameter, so we
+   must annotate the type to let ghc knows what value to have.
+   It's essentially a function that takes two type parameters s and a and
+   reutrn a value of Num a.
+   To use the functoin, we apply the function with types using "TypeApplication"
+   so reflect @Zero'.
+   This essentially project Zero' on type level to 0 on term level.
+-}
+
 class ReflectNum s where
   reflectNum :: forall s a . Num a => a
 
