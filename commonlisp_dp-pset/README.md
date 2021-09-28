@@ -1,0 +1,3 @@
+## some Dynamic programming in cl
+
+I always felt I wrote tons of dp problem in dp but It turns out there are only two and one is kinder garden level...
