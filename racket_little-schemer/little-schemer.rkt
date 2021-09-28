@@ -404,7 +404,6 @@
          (cons (rember/s* s (car l))
                (rember/s* s (cdr l)))))))
 
-
 ;; Shadows
 
 ; n + 3: a arithmetic expression
@@ -426,13 +425,11 @@
             (numbered? (car (cdr (cdr aexp))))))
       (else #f))))
 
-
 ;; The Seventh Commandment
 ;; Recur on the subpart that are of the same nature.
 
 ;; The Eighth Commandement
 ;; Use help functions to abstract from representations.
-
 
 ; (define value
 ;   (lambda (nexp)
@@ -461,13 +458,7 @@
 (define sero?  (lambda (n) (null? n)))
 (define edd1 (lambda (n) (cons '() n)))
 (define zub1 (lambda (n) (cdr n)))
-(define qlus
-  (lambda (m n)
-    (cond
-      ((sero? m) n)
-      (else
-        (edd1 (qlus n (zub1 m)))))))
-
+(define qlus (lambda (m n) (cond ((sero? m) n) (else (edd1 (qlus n (zub1 m)))))))
 
 ;; Relations
 
@@ -485,19 +476,13 @@
       ((null? lat) '())
       ((member? (car lat) (cdr lat))
        (makeset (cdr lat)))
-      (else
-        (cons (car lat) (makeset
-                          (multirember (car lat)
-                                       (cdr lat))))))))
+      (else (cons (car lat) (makeset (multirember (car lat) (cdr lat))))))))
 
 (define subset?
   (lambda (set1 set2)
     (cond
       ((null? set1) #t)
-      (else
-        (and (member? (car set1) set2)
-             (subset? (cdr set1) set2))))))
-
+      (else (and (member? (car set1) set2) (subset? (cdr set1) set2))))))
 
 (define eqset?
   (lambda (set1 set2) (and (subset? set1 set2) (subset? set2 set1))))
@@ -506,9 +491,7 @@
   (lambda (set1 set2)
     (cond
       ((null? set1) #f)
-      (else
-        (or (member? (car set1) set2)
-            (intersect? (cdr set1) set2))))))
+      (else (or (member? (car set1) set2) (intersect? (cdr set1) set2))))))
 
 (define intersect
   (lambda (s1 s2)
@@ -517,8 +500,7 @@
          ((null? set1) '())
          ((member? (car set1) set2)
           (cons (car set1) (intersect (cdr set1) set2)))
-         (else
-           (intersect (cdr set1) set2))))
+         (else (intersect (cdr set1) set2))))
     (makeset s1)
     (makeset s2))))
 
@@ -529,9 +511,7 @@
         ((null? set1) set2)
         ((member? (car set1) set2)
          (union (cdr set1) set2))
-        (else
-          (cons (car set1)
-                (union (cdr set1) set2)))))
+        (else (cons (car set1) (union (cdr set1) set2)))))
      (makeset s1)
      (makeset s2))))
 
@@ -543,9 +523,7 @@
          ((null? set1) '())
          ((member? (car set1) set2)
           (one-side-difference (cdr set1) set2))
-         (else
-           (cons (car set1)
-                 (one-side-difference (cdr set1) set2))))))
+         (else (cons (car set1) (one-side-difference (cdr set1) set2))))))
     ((lambda (l1 l2)
       (union (one-side-difference l1 l2)
              (one-side-difference l2 l1)))
@@ -564,9 +542,7 @@
 (define second (lambda (p) (car (cdr p))))
 (define third (lambda (p) (car (cdr (cdr p)))))
 (define build (lambda (s1 s2) (cons s1 (cons s2 '()))))
-(define revpair
-  (lambda (pair)
-    (build (second pair) (first pair))))
+(define revpair (lambda (pair) (build (second pair) (first pair))))
 
 ; define a pair (S-expr S-expr)
 (define a-pair?
@@ -587,24 +563,19 @@
   (lambda (rel)
     (cond
       ((null? rel) '())
-      (else
-        (cons (revpair (car rel))
-              (reverl (cdr rel)))))))
+      (else (cons (revpair (car rel)) (reverl (cdr rel)))))))
 
 (define one-to-one?
   (lambda (l)
     (and (fun? l)
          (fun? (reverl l)))))
 
-
 (define rember-f
   (lambda (test? a l)
     (cond
       ((null? l) '())
       ((test? (car l) a) (cdr l))
-      (else (cons (car l)
-                  (rember-f test? a
-                            (cdr l)))))))
+      (else (cons (car l) (rember-f test? a (cdr l)))))))
 
 ; lambda...
 
@@ -625,8 +596,7 @@
         ((null? l) '())
         ((eq? (car l) old)
          (seq new old (cdr l)))
-        (else (cons (car l)
-                    ((insert-g seq) new old (cdr l))))))))
+        (else (cons (car l) ((insert-g seq) new old (cdr l))))))))
 
 ;; The Ninth Commandment
 ;; Abstract common patterns with a new function.
@@ -634,7 +604,6 @@
 ;; a substitution with insert.
 (define seqS (lambda (new old l) (cons new l)))
 (define subst_ (insert-g seqS))
-
 
 ; a prototype of eval.
 (define atom-to-function
@@ -668,9 +637,7 @@
       ((null? lat) '())
       ((test? (car lat))
        (multiremberT test? (cdr lat)))
-      (else
-        (cons (car lat)
-              (multiremberT test? (cdr lat)))))))
+      (else (cons (car lat) (multiremberT test? (cdr lat)))))))
 
 
 ;; The Tenth Commandment
@@ -787,12 +754,7 @@
                                                  (* ap dp)
                                                  (+ as ds))))))))))
 (define get-result
-  (lambda (newl product sum)
-    (cons
-      (cons
-        product
-        (cons
-          sum '())) newl)))
+  (lambda (newl product sum) (cons (cons product (cons sum '())) newl)))
 ; (evens-only*&co '((10 9 1 2) 3 10 (9 9) 7 98) get-result)
 
 ;
@@ -810,9 +772,7 @@
       (else (eq? sorn a)))))
 
 ; partial recusrive function and total recursive function
-(define eternity
-  (lambda (x)
-    (eternity x)))
+(define eternity (lambda (x) (eternity x)))
 
 ; take a pair with first component is a pair, it shift the (car (cdr ) first pair)
 ; into the second component.
@@ -876,18 +836,14 @@
 
 
 ; Ackermann  // unnatrual recursion, total function.
-(define A
-  (lambda (n m)
-    (cond
-      ((zero? n) (add1 m))
-      ((zero? m) (A (sub1 n) 1))
-      (else (A (sub1 n)
-               (A n (sub1 m)))))))
+(define A (lambda (n m)
+    (cond ((zero? n) (add1 m))
+          ((zero? m) (A (sub1 n) 1))
+          (else (A (sub1 n) (A n (sub1 m)))))))
 
 ; (A 4 3) take forever.
 
 ; HOW TO MAKE A Y COMBINATOR
-
 ;; Version 1 ;;
 ; (lambda (l)
 ;   (cond
@@ -989,7 +945,6 @@
 ; Thus, (Y g) = (g (Y g)) = ... = (g(g ... (g (Y g) ...)))
 ; any of them works the same as Y.
 
-;
 ; applicative Y combinator, the versoin we write.
 ;
 ; Y := λg.(λf.(f f) λf.g(λx.((f f) x)))
@@ -1001,8 +956,7 @@
 ;     = h((F F) x)
 ;     = h(h ((F F) x)) = ...
 
-; omega combinator: apply a func to itself.
-; (lambda (o) (o o))
+; omega combinator: apply a func to itself. (lambda (o) (o o))
 
 ; apply to Y to achieve generic recursion.
 ; ((Y (lambda (len)
@@ -1060,10 +1014,7 @@
 
 (define extend-table
   (lambda (new-e old-table)
-    (cond
-      ((not (entry? new-e)) old-table)
-      (else
-        (cons new-e old-table)))))
+    (cond ((not (entry? new-e)) old-table) (else (cons new-e old-table)))))
 
 ; (extend-table (new-entry '(b c d) '(1 2 3))
 ;               (cons (new-entry '(A B C) '(0 9 8))
@@ -1083,12 +1034,7 @@
                                             (cdr table)
                                             table-f)))))))
 ; lisp types:
-;     *const
-;     *quote
-;     *identifier
-;     *lambda
-;     *cond
-;     *application
+;     *const *quote *identifier *lambda *cond *application
 
 ; value: find out the type of the expression and invoke
 ; associated function(also called action here).
@@ -1096,26 +1042,17 @@
 
 (define expression-to-action
   (lambda (e)
-    (cond
-      ((atom? e) (expression-to-action e))
-      (else (list-to-action e)))))
+    (cond ((atom? e) (expression-to-action e)) (else (list-to-action e)))))
 
 (define atom-to-action
   (lambda (e)
     (cond
       ((number? e) *const)
-      ((eq? e #t) *const)
-      ((eq? e #f) *const)
-      ((eq? e 'cons) *const)
-      ((eq? e 'car) *const)
-      ((eq? e 'cdr) *const)
-      ((eq? e 'null?) *const)
-      ((eq? e 'eq?) *const)
-      ((eq? e 'atom?) *const)
-      ((eq? e 'zero?) *const)
-      ((eq? e 'add1) *const)
-      ((eq? e 'sub1) *const)
-      ((eq? e 'number?) *const)
+      ((eq? e #t) *const) ((eq? e #f) *const)
+      ((eq? e 'cons) *const) ((eq? e 'car) *const) ((eq? e 'cdr) *const)
+      ((eq? e 'null?) *const) ((eq? e 'eq?) *const)
+      ((eq? e 'atom?) *const) ((eq? e 'zero?) *const)
+      ((eq? e 'add1) *const) ((eq? e 'sub1) *const) ((eq? e 'number?) *const)
       (else *identifier))))
 
 (define list-to-action
@@ -1132,12 +1069,8 @@
       (else *application))))
 
 ; interpreter...
-(define value
-  (lambda (e)
-    (meaning e (quote ()))))
-(define meaning
-  (lambda (e table)
-    ((expression-to-action e) e table)))
+(define value (lambda (e) (meaning e (quote ()))))
+(define meaning (lambda (e table) ((expression-to-action e) e table)))
 
 ; actions
 (define *const
@@ -1149,38 +1082,20 @@
       (else (build (quote primitive) e)))))
 
 (define text-of cdr)
-(define *quote
-  (lambda (e table)
-    (text-of e)))
+(define *quote (lambda (e table) (text-of e)))
 ; (*quote '(quote a b c) '())
 
 (define *identifier
-  (lambda (e table)
-    (lookup-in-table e table (lambda (name)
-                               (car (quote ()))))))
-
+  (lambda (e table) (lookup-in-table e table (lambda (name) (car (quote ()))))))
 (define *lambda
-  (lambda (e table)
-    (build (quote non-primitive)
-           (cons table (cdr e)))))
-
-(define table-of
-  (lambda (lambda-expr)
-    (first (second lambda-expr))))
-
-(define formals-of
-  (lambda (lambda-expr)
-    (second (second lambda-expr))))
-
-(define body-of
-  (lambda (lambda-expr)
-    (third (second lambda-expr))))
-
+  (lambda (e table) (build (quote non-primitive) (cons table (cdr e)))))
+(define table-of (lambda (lambda-expr) (first (second lambda-expr))))
+(define formals-of (lambda (lambda-expr) (second (second lambda-expr))))
+(define body-of (lambda (lambda-expr) (third (second lambda-expr))))
 
 (table-of (*lambda '(lambda (x) x) '((a b c) (1 2 3))))
 (formals-of (*lambda '(lambda (x) x) '((a b c) (1 2 3))))
 (body-of (*lambda '(lambda (x) x) '((a b c) (1 2 3))))
-
 
 (define evcon
   (lambda (lines table)
@@ -1232,35 +1147,21 @@
     (define apply_
       (lambda (fun vals)
         (cond
-          ((primitive? fun)
-           (apply-primitive
-             (second fun) vals))
-          ((non-primitive? fun)
-           (apply-closure
-             (second fun) vals)))))
+          ((primitive? fun) (apply-primitive (second fun) vals))
+          ((non-primitive? fun) (apply-closure (second fun) vals)))))
     (define apply-primitive
       (lambda (name vals)
         (cond
-          ((eq? name 'cons)
-           (cons (first vals) (second vals)))
-          ((eq? name 'car)
-           (car (first vals)))
-          ((eq? name 'cdr)
-           (cdr (first vals)))
-          ((eq? name 'null?)
-           (null? (first vals)))
-          ((eq? name 'eq?)
-           (eq? (first vals)))
-          ((eq? name 'atom?)
-           (:atom? (first vals))) ; use atom? directly?
-          ((eq? name 'zero?)
-           (zero? (first vals)))
-          ((eq? name 'add1)
-           (add1 (first vals)))
-          ((eq? name 'sub1)
-           (sub1 (first vals)))
-          ((eq? name 'number?)
-           (number? (first vals))))))
+          ((eq? name 'cons) (cons (first vals) (second vals)))
+          ((eq? name 'car) (car (first vals)))
+          ((eq? name 'cdr) (cdr (first vals)))
+          ((eq? name 'null?) (null? (first vals)))
+          ((eq? name 'eq?) (eq? (first vals)))
+          ((eq? name 'atom?) (:atom? (first vals))) ; use atom? directly?
+          ((eq? name 'zero?) (zero? (first vals)))
+          ((eq? name 'add1) (add1 (first vals)))
+          ((eq? name 'sub1) (sub1 (first vals)))
+          ((eq? name 'number?) (number? (first vals))))))
     (define apply-closure
       (lambda (closure vals)         ; closure: lambda expr
         (meaning (body-of closure)
@@ -1273,9 +1174,7 @@
       (meaning (function-of e) table)
       (evlis (arguments-of e) table))))
 
-
 ; example of closure
 ; (((u v w) (1 2 3)) ((x y z) (4 5 6)) (x y) (cons z x))
 ; example of vals
 ; ((a b c)(d e f))
-
