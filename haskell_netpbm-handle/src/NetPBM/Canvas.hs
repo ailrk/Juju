@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds     #-}
 {-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE GADTs               #-}
 {-# LANGUAGE KindSignatures      #-}
@@ -27,6 +28,7 @@ import qualified Data.Vector.Mutable as M
 import           Data.Word
 import           Debug.Trace
 import           GHC.TypeLits
+import           NetPBM.Format
 
 -- a canvas is a binary buffer holds characters.
 -- it holds a mutable array,
@@ -35,28 +37,31 @@ import           GHC.TypeLits
 -- width and height should known statically.
 
 data Canvas s (width :: Nat) (height :: Nat) (pixel :: Type) where
-  Canvas :: M.STVector s pixel -> Canvas s width height pixel
+  Canvas :: IsPxiel pixel => M.STVector s pixel -> Canvas s width height pixel
+
+type IsCanvas width height pixel =
+  (KnownNat width, KnownNat height, IsPxiel pixel)
 
 new :: forall width height pixel s
-     . (KnownNat width , KnownNat height)
+     . IsCanvas width height pixel
     => ST s (Canvas s width height pixel)
 new = let m = natVal (Proxy @width)
           n = natVal (Proxy @height)
-       in Canvas <$> (M.generate (fromIntegral (m * n)) (const 0))
+       in Canvas <$> (M.generate (fromIntegral (m * n)) (const defaultPixelRep))
 
-size :: (KnownNat width , KnownNat height)
+size :: IsCanvas width height pixel
      => Canvas s width height pixel -> Int
 size (Canvas v) = M.length v
 
-toByteString :: (KnownNat width , KnownNat height)
+toByteString :: IsCanvas width height pixel
              => Canvas s width height pixel -> ST s BS.ByteString
 toByteString (Canvas buffer) = do
   vs <- V.freeze $ buffer
-  return $ BS.pack . V.toList $ vs
+  return $ BS.concat . fmap toByte . V.toList  $ vs
 
-index :: (KnownNat width , KnownNat height)
+index :: IsCanvas width height pixel
       => (Int, Int)
-      -> Canvas s width height pixel -> ST s (Maybe Word8)
+      -> Canvas s width height pixel -> ST s (Maybe pixel)
 index (m, n) c@(Canvas buffer) =
   let i = m * n
       sz = size c
@@ -65,18 +70,18 @@ index (m, n) c@(Canvas buffer) =
          else Just <$> M.read buffer i
 
 modify :: forall width height pixel s
-        . (KnownNat width, KnownNat height)
+        . IsCanvas width height pixel
        => Canvas s width height pixel
        -> (Int, Int)
-       -> (Word8 -> Word8)
+       -> (pixel -> pixel)
        -> ST s ()
 modify (Canvas buffer) (m, n) action  =
   let w = natVal (Proxy @width)
    in M.modify buffer action (m * fromInteger w + n)
 
 imapM_ :: forall width height m s pixel b
-        . (KnownNat width, KnownNat height)
-      => ((Int, Int) -> Word8 -> ST s b)
+        . IsCanvas width height pixel
+      => ((Int, Int) -> pixel -> ST s b)
       -> Canvas s width height pixel
       -> ST s ()
 imapM_ f (Canvas buffer) =
@@ -86,14 +91,14 @@ imapM_ f (Canvas buffer) =
                        in f (d, r) n)
                buffer
 
-iforM_ :: (KnownNat width, KnownNat height)
+iforM_ :: IsCanvas width height pixel
       => Canvas s width height pixel
-      -> ((Int, Int) -> Word8 -> ST s b)
+      -> ((Int, Int) -> pixel -> ST s b)
       -> ST s ()
 iforM_ = flip imapM_
 
-foldM :: (KnownNat width, KnownNat height)
-      => (b -> Word8 -> ST s b)
+foldM :: IsCanvas width height pixel
+      => (b -> pixel -> ST s b)
       -> b
       -> Canvas s width height pixel
       -> ST s b
