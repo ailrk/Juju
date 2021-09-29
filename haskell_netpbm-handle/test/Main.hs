@@ -29,13 +29,13 @@ test_canvas = do
         C.modify v (m, n) (+ (fromIntegral (ord 'a')))
       return v
 
-test_format :: IO ()
-test_format = do
-  let b = withFormat (Proxy @P5) $ \header serialize ->
-    let data = [ ' ', ' ', 'z'
-               , ' ', 'z', ' '
-               , 'z', ' ', ' ']
-        wdata = (fromIntegral . ord) data
-     in serialize (header 3 3 255) wdata
+test_draw :: IO ()
+test_draw = do
+  let b = F.withFormat (Proxy @F.P5)
+        $ \header serialize ->
+          let buf = [ ' ', ' ', 'z'
+                    , ' ', 'z', ' '
+                    , 'z', ' ', ' ']
+              wbuf = fmap (fromIntegral . ord) buf
+           in serialize (header 3 3 255) wbuf
   putStrLn (show b)
-  putStrLn "hi"
