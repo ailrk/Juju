@@ -1,5 +1,6 @@
 #include "pl0_lex.h"
 #include <iostream>
+#include <vector>
 
 // Shift reduce parser:
 //
@@ -11,9 +12,17 @@
 static Symbol sym;
 static Symbol *code;
 
+std::vector<char> buffer;
+
 void nextsym(void) {
     static int pos = 0;
     while (code[pos] != eof) ++pos;
 }
 
 void error(char const msg[]) { fprintf(stderr, msg); }
+
+void accept() {}
+
+void shift() {}
+
+void reduce() {}

@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-methods #-}
-module Sharing where
+module Sharing.Sharing where
 
 
 tree1 :: (Eq a, Num a, Num b) => a -> b

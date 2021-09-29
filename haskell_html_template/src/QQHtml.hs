@@ -42,6 +42,8 @@ htmlExpr str = do
 htmlPat :: String -> Q Pat
 htmlPat "<_>"   = [p| Tag _ children |]
 htmlPat "<strong>"   = [p| Tag "strong" children |]
+htmlPat "<i>"   = [p| Tag "i" children |]
+htmlPat "<b>"   = [p| Tag "b" children |]
 htmlPat "#text" = [p| Text text |]
 htmlPat ('<':rest) = return $
   ConP (mkName "HTML.tag")

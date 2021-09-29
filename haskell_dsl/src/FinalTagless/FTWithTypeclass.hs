@@ -1,2 +1,0 @@
-module FinalTagless.FTWithTypeclass where
-
