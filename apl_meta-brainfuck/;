@@ -1,0 +1,66 @@
+⎕IO←0
+)copy dfns display
+
+⍝ Brain buck.
+⍝ The machine has two tapes: a `token stream` and an `infinite tape`.
+⍝ 8 operations:
+⍝   . : output
+⍝   , : input
+⍝   < / >: move tape ptr one left/right
+⍝   + / -: inc of dec value on current tape cell
+⍝   [ / ]: [ if 0 jump to ]; ] if not 0 jump to [
+
+⍝ -----------------------------------------------------------------------------
+⍝ brainfuck impl
+⍝ -----------------------------------------------------------------------------
+
+⍝ A tape is a cell with three elements:
+⍝  left | curent | right
+⍝ extending the tape means creating a new layer of nesting.
+⍝                       ┌→──────────┐
+⍝   ┌→────┐             │     ┌→──┐ │
+⍝   │0 1 0│    →        │ 0 0 │1 0│ │
+⍝   └~────┘ move left   │     └~──┘ │
+⍝                       └∊──────────┘
+
+
+bf←{
+  ⍝ get←{_ m _←⍵⋄m}
+  ⍝ put←{l _ r←⍵⋄l ⍺ r}
+
+  ⍝ left←{(l1 l2)m r←⍵⋄l1 l2(m r)}      ⍝ extend the array by boxing (m r)
+  ⍝ right←{l m(r1 r2)←⍵⋄(l m)r1 r2}
+
+  get←{_ m _←⍵⋄m}
+  set←{l _ r←⍵⋄l ⍺ r}
+  left←{l m r←⍵⋄l l(m r)}
+  right←{l m r←⍵⋄(l m)r r}
+
+  ⍝ note in performance: O(1) with pattern matching. If we do +∘1 0 1 it will
+  ⍝ be O(n) because we need to traverse each spine at least once.
+  inc←{l m r←⍵⋄l(m+1)r}
+  dec←{l m r←⍵⋄l(m-1)r}
+
+  jump←{
+    from to←{⍵,'[]'~⍵}get ⍵
+  }
+
+  tape←0 1 0
+
+  display left left tape
+
+  display left left right right tape
+
+  display right left left tape
+
+  display right right tape
+  display left left right right  tape
+}
+
+
+⍝ -----------------------------------------------------------------------------
+⍝ macro
+⍝ -----------------------------------------------------------------------------
+
+
+
