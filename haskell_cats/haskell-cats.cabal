@@ -28,8 +28,10 @@ library
       Endomorphism
       FAlgebra
       FreeMonad
+      FreeMagma
       LimitsAndColimits
       NaturalTranformation
+      GroupoidAndSmallCategory
       Iso
 
     -- Modules included in this library but not exported.

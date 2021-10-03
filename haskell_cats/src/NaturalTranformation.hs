@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs                    #-}
 {-# LANGUAGE KindSignatures           #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE RankNTypes               #-}
+{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TypeOperators            #-}
 module NaturalTranformation where
 
@@ -88,12 +88,15 @@ listToMaybe = NaturalTransfrom go
 
 maybeToList :: Maybe :-> []
 maybeToList = NaturalTransfrom go
-  where go Nothing = []
+  where go Nothing  = []
         go (Just x) = [x]
 
--- an automorphism.
+-- an endo functor.
+-- Note, functor reserve identity morphism, so id behaves the same before and
+-- after reverse
 reverse' :: [] :-> []
 reverse' = NaturalTransfrom reverse
 
-
-
+-- NOTE: when talking about morphisms it's important to denote precisely
+--       where it comes and where it goes. If it's an endo functor don't call
+--       it endo morphism.

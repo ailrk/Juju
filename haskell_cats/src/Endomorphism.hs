@@ -83,9 +83,8 @@ instance Monad m => Monoid (KEndo m a) where
 concatKEndos :: Monad m => [a -> m a] -> a -> m a
 concatKEndos = appKEndo . foldMap KEndo
 
-kendo1 = concatKEndos [ \n -> putStrLn n >> return n
-                      , \n -> putStrLn n >> return (n ++ "v1")
-                      , \n -> putStrLn n >> return (n ++ "v2") ]
+kendo1 = concatKEndos [ mkaction "" , mkaction "v1" , mkaction "v2" ]
+  where mkaction s = \n -> putStrLn n >> return (n ++ s)
 
 -- 1 2
 kendo2 = concatKEndos [ \() -> putStrLn "1", \() -> putStrLn "2"]
@@ -163,6 +162,7 @@ reducer n | trace (show "force") $ False = undefined
 
 reducer (Add n)  = KEndoT $ \s -> do
   let s1 = case s of VM (x:xs) -> VM (x + n:xs); VM [] -> VM []
+  putStrLn "sup, I can print but ignore me"
   return (s1, mempty)
 reducer (Sub n)  = reducer (Add (negate n))
 reducer Inc      = reducer (Add 1)

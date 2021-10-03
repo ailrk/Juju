@@ -14,9 +14,11 @@ import           Iso
    more elements from that set. (string with concatenation)
    Identity is empty string
 
-   given a set A, the free monid is denoted as A*
+   - given a set A, the free monid is denoted as A*
 
-   Any monoid iso to free monoid is described as free.
+   - Any monoid iso to free monoid is described as free.
+
+   - Every monoid is a homomorphic image of some free monoid.
 -}
 
 
@@ -77,6 +79,19 @@ instance Monoid Nat where
 
 -- sequence of 1, 1+1, ...
 
+-------------------------------------------------------------------------------
+-- monoid morphism
+-------------------------------------------------------------------------------
+{-
+   - monoid morphism from a free monoid B* to a monoid M.
+   f(xy) = f(x).f(y) for words x, y, and f(e) = i. where e, i are id in B*, M
+
+   - to compute monoid morphism we fisrt map elements form B* to M, then
+     fold with monoid binary operator.
+-}
+
+monoidMorphism :: (Monoid a, Monoid b, Traversable f) => (a -> b) -> f a -> b
+monoidMorphism f as = foldr (<>) mempty (fmap f as)
 
 -------------------------------------------------------------------------------
 -- history monoid
@@ -93,5 +108,3 @@ instance Monoid Nat where
 
 class Endo a where
   appEndo :: a -> a
-
-
