@@ -22,42 +22,47 @@
 ⍝   └~────┘ move left   │     └~──┘ │
 ⍝                       └∊──────────┘
 
-
 bf←{
-  ⎕IO ⎕ML←0
+  ⎕IO ⎕ML←0 1
 
   ⍝ extends tape if exceeds.
   left←{(l1 l2) m r←⍵⋄l1 l2(m r)} ⋄ right←{l m (r1 r2)←⍵⋄(l m)r1 r2}
   get←{_ m _←⍵⋄m} ⋄ set←{l _ r←⍵⋄l ⍺ r}
-  if←{(⍺⍺⍣⍵)⍺}    ⍝ double recursion
+  if←{(⍺⍺⍣⍵)⍺}
 
   ⍝ note in performance: O(1) with pattern matching. If we do +∘1 0 1 it will
   ⍝ be O(n) because we need to traverse each spine at least once.
   inc←{l m r←⍵⋄l(m+1)r} ⋄ dec←{l m r←⍵⋄l(m-1)r}
   input←{(⎕UCS ⍬⍴⍞)put ⍵} ⋄ output←{⍵⊣⍞←⎕UCS get ⍵}
 
-  jump←{
+  skip←{
     from to←{⍵,'[]'~⍵}get ⍵
+    ⍺⍺{
+      t←get ⍺
+      t≡to:⍵
+      t≡fm≡∇ ⍺⍺ ∇ ⍺⍺ ⍵
+      t≡'∘':⍵ ⋄ ∇ ⍺⍺ ⍵
+    } ⍺⍺ ⍵
   }
 
   run←{
     token←get ⍵
-    '>'≡token:(right ⍺)∇right ⍵ ⋄ '<'≡token:(left ⍺)∇right ⍵
-    '+'≡token:(inc ⍺)∇ right ⍵ ⋄ '-'≡token:(dec ⍺)∇ right ⍵
+    '>'≡token:(right ⍺)∇right ⍵
+    '<'≡token:(left ⍺)∇right ⍵
+    '+'≡token:(inc ⍺)∇ right ⍵
+    '-'≡token:(dec ⍺)∇ right ⍵
     '['≡token:⍺ ∇ right⍵ right skip if 0=get ⍺
     ']'≡token:⍺ ∇ right⍵ left skip if 0≠get ⍺
-    '.'≡token:(output ⍺)∇ right ⍵ ⋄ ','≡token:(input ⍺)∇ right ⍵
+    '.'≡token:(output ⍺)∇ right ⍵
+    ','≡token:(input ⍺)∇ right ⍵
     '∘'≡token:shy←1↓∊⍺
     ⍺ ∇ right ⍵
   }
 
-  ⍺←0 ⋄ tape←0, ↑{⍺ ⍵}/⍺,0 ⋄ tape run '∘',↑{⍺ ⍵}/⍵,'∘'
+  ⍺←0 ⋄ tape←0, ↑{⍺ ⍵}/⍺,0
+  tape run '∘',↑{⍺ ⍵}/⍵,'∘'
 }
-
 
 ⍝ -----------------------------------------------------------------------------
 ⍝ macro
 ⍝ -----------------------------------------------------------------------------
-
-
-
