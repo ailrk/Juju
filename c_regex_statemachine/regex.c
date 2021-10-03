@@ -383,7 +383,7 @@ void build_from_node(node *n) {
         // note: | has the shape
         //    |
         //   / \
-    //  A   B
+        //  A   B
         // let state before a be x. then state after a is x + 1, after b is
         // x + 2.
         // we save the state x on the stack, and when the second time we
@@ -411,7 +411,7 @@ void build_from_node(node *n) {
             // note: * in the ast has the shape
             //      *
             //     / \
-      //    _   n
+            //    _   n
             //
             // where n is the right child, so * will be hit twice before we
             // reach n. let state before n be x. after be y. without * it should

@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs #-}
 
-module FinalTagless.IntiallTagless where
+module FinalTagless.IntialTagless where
 
 
 {-

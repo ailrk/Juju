@@ -7,7 +7,9 @@ module Endomorphism where
 
 import           Control.Monad
 import           Control.Monad.ST
+import           Data.Monoid      (Sum)
 import           Data.STRef
+import           Debug.Trace
 import           Iso
 
 {- abstract:
@@ -88,7 +90,6 @@ kendo1 = concatKEndos [ \n -> putStrLn n >> return n
 -- 1 2
 kendo2 = concatKEndos [ \() -> putStrLn "1", \() -> putStrLn "2"]
 
-
 --------------------------------------------------------------------------------
 -- Kesli endomorphism is isomorphic to stateT monad
 -------------------------------------------------------------------------------
@@ -115,6 +116,9 @@ instance Injective (Endo s) (State s ()) where to (Endo endo) = StateT $ \s -> r
 instance Injective (State s ()) (Endo s) where to st = Endo $ fst . unIdentity . runState st
 instance Iso (Endo s) (State s ())
 
+-- we can also generalize () to Monoid a, but let's leave it for the next
+-- section
+
 --------------------------------------------------------------------------------
 -- generalize KEndo essentially make it a state monad.
 -------------------------------------------------------------------------------
@@ -135,18 +139,48 @@ instance Monad m => Monad (KEndoT s m) where
   m >>= f = (from :: StateT s m a -> KEndoT s m a)  $ to m >>= \x -> to (f x)
 
 -- and of course, KEndoT is still a monoid.
+-- the essense is to compose (s -> s m a) -> (s -> s m a)
 instance (Monoid a, Monad m) => Semigroup (KEndoT s m a) where
   (KEndoT k1) <> (KEndoT k2) = KEndoT $ \s -> do
-    (s1, a) <- k2 s; (s2, a1) <- k1 s1; return (s2, a <> a1)
+    (s1, a) <- k1 s; (s2, a1) <- k2 s1; return (s2, a <> a1)
+
 instance (Monoid a, Monad m) => Monoid (KEndoT s m a) where
   mempty = KEndoT $ \s -> return (s, mempty)
 
 --------------------------------------------------------------------------------
--- A reducer with Endo
--------------------------------------------------------------------------------
+-- reducer with kleisli endomorphism transformer
+--------------------------------------------------------------------------------
+-- Reduce base on a list of actions. this still ended up like a inductive
+-- definition. Again, everything is interpreter!
 
-data VM6502 = Count { regX :: Int, regY :: Int, acc :: Int, stack :: [Int] }
-data Action =
+data VM = VM { stack :: [Int] } deriving Show
+data Action = Add Int | Sub Int | Inc | Dec | Pop | Push Int
 
- -- reducer :: Action
+-- | Copy Int
 
+reducer :: Action -> KEndoT VM IO (Sum Int)
+reducer n | trace (show "force") $ False = undefined
+
+reducer (Add n)  = KEndoT $ \s -> do
+  let s1 = case s of VM (x:xs) -> VM (x + n:xs); VM [] -> VM []
+  return (s1, mempty)
+reducer (Sub n)  = reducer (Add (negate n))
+reducer Inc      = reducer (Add 1)
+reducer Dec      = reducer (Add (negate 1))
+reducer Pop      = KEndoT $ \s -> do
+  let s1 = case s of VM (x:xs) -> VM (xs); VM [] -> VM []
+  return (s1, mempty)
+reducer (Push n) = KEndoT $ \s -> do
+  let VM vs = s
+  return (VM (n:vs), mempty)
+
+res = do
+  (vm, i) <- flip appKEndoT (VM []) $ foldMap reducer program
+  putStrLn (show vm)
+  putStrLn (show i)
+  where
+    program = [ Push 1
+              , Push 2
+              , Inc
+              , Inc
+              ]

@@ -29,7 +29,7 @@ library
 
       FinalTagless.FinalTagless
       FinalTagless.InitialTagged
-      FinalTagless.IntiallTagless
+      FinalTagless.IntialTagless
 
       Interp.Arith
       Interp.FOAS
