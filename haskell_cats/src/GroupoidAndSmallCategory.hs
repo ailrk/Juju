@@ -44,6 +44,13 @@ class Monoid a => Group a where
 -------------------------------------------------------------------------------
 {-
    pullback:
+     a pullback is a subset of the cartesian product of two sets.
+
+           f         g
+        A --->  C  <--- B
+
+     let X be the subset of A x B consisting of pairs (a, b) such that
+     f(a) = g(b) holds.
 
      - pullback is a concept in category `Set`
 
