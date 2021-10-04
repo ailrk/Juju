@@ -1,3 +1,7 @@
+open Syntax
+open Util
+
+
 let e1 =
   let plus_x n = App (App (plus, Var "x"), n)
   in App (Fun ("x", App (App (times, plus_x (int 1)), plus_x (int (-1)))),

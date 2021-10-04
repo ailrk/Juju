@@ -5,6 +5,9 @@ module FreeMonad where
 
 import Control.Monad
 
+{- The idea of a free monad is to give a simpler structure more properties. -}
+
+
 -------------------------------------------------------------------------------
 -- free monad
 -------------------------------------------------------------------------------

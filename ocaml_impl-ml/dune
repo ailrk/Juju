@@ -1,7 +1,9 @@
 (library
  (name impl_ml)
- (modules "core_ml"
-          "core_ocaml"
-          "object_layer"
-          "module_language"
-          "module_and_object"))
+ (modules "reduce"
+          "test"
+          "small_step"
+          "big_step"
+          "unify"
+          "syntax"
+          "util"))
