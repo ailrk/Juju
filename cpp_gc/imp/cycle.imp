@@ -1,0 +1,9 @@
+// referece count is not enough for this situation.
+
+do
+    a := alloc[2];
+    b := alloc[2];
+
+    a[0] := b;
+    b[0] := a;
+end

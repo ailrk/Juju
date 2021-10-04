@@ -1,0 +1,16 @@
+// simple scalars are on stack.
+
+a := 10;
+b := 20;
+
+c := true;
+
+while a = 0 && b = 0 do
+    if a / 2 == 0 then
+        a := a + 2;
+        b := b - 3;
+    else
+        a := a - 1;
+        b := b + 2;
+    end
+end

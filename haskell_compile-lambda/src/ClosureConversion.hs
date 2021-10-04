@@ -20,18 +20,17 @@ import           Text.Pretty.Simple           (pPrint, pShowNoColor, pString)
 
 type Var = String
 
-data Expr where
-  Var :: Var -> Expr
-  Apply :: { f :: Expr, args :: [Expr] } -> Expr
-  Lambda :: { args ::  [Expr], body :: Expr } -> Expr
+data Expr
+  = Var Var
+  | Apply Expr [Expr]
+  | Lambda [Expr] Expr
 
--- closure conversion only
-  LambdaConverted :: { args :: [Expr] , body :: Expr } -> Expr
-  MkClosure ::  { lam :: Expr, env :: Expr } -> Expr
+  | LambdaConverted [Expr] Expr
+  | MkClosure Expr Expr
 
-  MkEnv :: { envlist :: [(Expr, Expr)] } -> Expr
-  EnvRef :: { env :: Expr, var :: Expr } -> Expr
-  ApplyClosure :: { f :: Expr, args :: [Expr] } -> Expr
+  | MkEnv [(Expr, Expr)]
+  | EnvRef Expr Expr
+  | ApplyClosure Expr [Expr]
 
 instance Show Expr where
   show (Var v) = show v

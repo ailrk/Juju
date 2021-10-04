@@ -2,8 +2,6 @@
  (name impl_ml)
  (modules "reduce"
           "test"
-          "small_step"
-          "big_step"
           "unify"
           "syntax"
           "util"))

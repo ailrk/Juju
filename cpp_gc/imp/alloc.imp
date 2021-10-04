@@ -1,0 +1,25 @@
+// the only data structure is builtin heap allocated array.
+// there is no stack array.
+
+do
+    nil := alloc[0];              // @ +0 heap alloc
+
+    xs := alloc[2]; xs[1] := 1;   // @ +2 heap alloc
+    ys := alloc[2]; xs[2] := 2;   // @ +2 heap alloc
+    zs := alloc[2]; xs[3] := 3;   // @ +2 heap alloc
+
+    do qs := alloc[2]; end         // @ +2 heap alloc
+
+                                   // @ qs is garbage
+
+    xs[0] := ys;
+    ys[0] := zs;
+    zs[0] := nil;
+
+    do
+        p := xs
+        while p[0] != nil do
+            p := p[0];
+        end
+    end
+end
