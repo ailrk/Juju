@@ -1,0 +1,18 @@
+#ifndef _IMP_STD_SORT
+#define _IMP_STD_SORT
+#include "../def.h"
+
+collector(MARK_SWEEP);
+allocator(FREE_LIST);
+
+def merge(as, size_a, bs, size_b, out) do
+end;
+
+def split(xs, size) do
+end;
+
+// inplace sort
+def sort(xs, size) do
+end;
+
+#endif

@@ -1,0 +1,13 @@
+#include "../def.h"
+
+collector(MARK_SWEEP);
+allocator(FREE_LIST);
+
+#include "sort"
+
+def binary_search(array, size, x) do
+    sort(array, size)
+end;
+
+do
+end;

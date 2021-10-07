@@ -4,7 +4,6 @@ ColumnLimit: 80
 
 AllowShortLambdasOnASingleLine: Empty
 AllowShortLoopsOnASingleLine: true
-AlwaysBreakAfterReturnType: TopLevel
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma

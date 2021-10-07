@@ -1,0 +1,46 @@
+#include "../def.h"
+collector[MARK_SWEEP];
+allocator[FREE_LIST];
+
+mat1 := do
+    allocate[9];
+    m[0]:=1; m[1]:=2; m[2]:=3;
+    m[3]:=3; m[4]:=2; m[5]:=1;
+    m[6]:=1; m[7]:=3; m[8]:=2;
+end;
+
+mat2 := do
+    m := allocate[9];
+    m[0]:=1; [1]:=2; m[2]:=3;
+    m[3]:=3; [4]:=2; m[5]:=1;
+    m[6]:=1; [7]:=3; m[8]:=2;
+end;
+
+//  [a b]  [1 2 3]   [a1b4 c1d4 e1f4]
+//  [c d]  [4 5 6]   [a2b5 c2d5 e2f5]
+//  [e f]            [a3b6 c3d6 e3f5]
+
+// each matrix multiplication allocates a new am * bn matrix.
+def MAT_MUL(A, am, an, B, bm, bn)
+  if not (an = bm) then abort else do
+      m := allocate(am * bn);
+      i := 0; j := 0; k = 0; row := am; col := bn;
+      while i < an do
+          while j < bm do
+              m[i * row + j] := 0; s := i * row + j;
+              while k < col do
+                  m[s] := m[s] + A[i * am + k] * B[k + bn + j];
+              end;
+          end;
+      end;
+  end;
+
+mat3 := MAT_MUL(mat1, 3, 3, mat2, 3 3);
+mat4 := MAT_MUL(mat3, 3, 3, mat2, 3 3);
+
+do
+    i := 0;
+    while i < 100 do
+        m := MAT_MUL(mat3, mat4);
+    end;
+end;

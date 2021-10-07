@@ -1,25 +1,26 @@
 // the only data structure is builtin heap allocated array.
 // there is no stack array.
 
+#include "../def.h"
+
+collector(MARK_SWEEP);
+allocator(FREE_LIST);
+
 do
-    nil := alloc[0];              // @ +0 heap alloc
+    nil := allocate[0];
 
-    xs := alloc[2]; xs[1] := 1;   // @ +2 heap alloc
-    ys := alloc[2]; xs[2] := 2;   // @ +2 heap alloc
-    zs := alloc[2]; xs[3] := 3;   // @ +2 heap alloc
+    xs := allocate[2]; xs[1] := 1;
+    ys := allocate[2]; xs[2] := 2;
+    zs := allocate[2]; xs[3] := 3;
 
-    do qs := alloc[2]; end         // @ +2 heap alloc
+    do qs := alloc[2]; end;
 
-                                   // @ qs is garbage
-
-    xs[0] := ys;
-    ys[0] := zs;
-    zs[0] := nil;
+    xs[0] := ys; ys[0] := zs; zs[0] := nil;
 
     do
-        p := xs
+        p := xs;
         while p[0] != nil do
             p := p[0];
-        end
-    end
-end
+        end;
+    end;
+end;
