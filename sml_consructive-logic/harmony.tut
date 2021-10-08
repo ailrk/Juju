@@ -1,0 +1,40 @@
+% some examples
+proof contractoin : A & A => A =
+begin
+[ A & A;        % assumtion
+  A ];          % via elimination
+A & A => A;     % conclusion
+end;
+
+proof drop : A => B => A =
+begin
+[ A;
+  [ B; A ];
+  B => A
+];
+A => B => A
+end;
+
+proof impDef : (~A|B) => A => B =
+begin
+[ ~A|B;
+  [ A;
+    [ ~A ; F; B ];
+    [ B; B ];
+    B ];
+  A => B;
+];
+(~A|B) => A => B
+end;
+
+proof dnLem : ~~(A | ~A) =
+begin
+[ ~(A | ~A);
+  [ A;
+    A | ~A;
+    F ];
+  ~A;
+  A | ~A;
+  F ];
+~~(A | ~A);
+end;
