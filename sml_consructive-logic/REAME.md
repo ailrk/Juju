@@ -1,5 +1,4 @@
 # Constuctive logic
-
 ## Four topics on logics:
 - Proofs as evidence for truth
 - proofs as programs

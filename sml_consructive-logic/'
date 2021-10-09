@@ -72,43 +72,19 @@ $     (local reduction of deduction D to D' of same judgement A true)
 %   A true   ⇒E   A true
 
 % e.g prove conjunction is locally sound and locally complete
-% local soundness:    (applying elim we get only old info back.)
-%       D       E
-%      A true  B true                 D
-%     ---------------- ∧I     ⇒R     A true
-%         A ∧ B true
-%       ------------ ∧EL
-%          A true
-%       D       E
-%      A true  B true                  E
-%     ---------------- ∧I     ⇒R     B true
-%         A ∧ B true
-%       ------------ ∧ER
-%          B true
-% local completeness: (elims can always give enough info to intro again)
-%                               D                D
-%                            A∧B true         A∧B true
-%                           ---------∧EL     --------∧ER
-%          D                 A true          B true
-%      A ∧ B true    ⇒E      ----------------------∧I
-%                                 A∧B true
-
-% substitution principle
-%   the most important property of hypothetical judgement is that we can
-%   substitue an assumption with the actual deduction to remove the assumption.
-%   Assumptions are labelled and scoped, thus we know which assumption we're
-   substituting with. An important rule is to respect the scope, we can't
-%   substitute a discharged assumption.
-
-
-% verification
-%   Verificationist believe the meaning of a proposition is determined by it's
-%   verfication: a proof that only analyzes the constituent of a proposition.
-%   if a verification is allowed to analyze things outside of it's scope it's
-%   possible to create a circular dependency, and we try to avoid that.
-%   A↑ means A has a verification, which means it's true.
-%
-
+% local soundness:
+%     D       E
+%    A true  B true                 D
+%   ---------------- ∧I     ⇒R     A true
+%       A ∧ B true
+%     ------------ ∧EL
+%        A true
+%     D       E
+%    A true  B true                  E
+%   ---------------- ∧I     ⇒R     A true
+%       A ∧ B true
+%     ------------ ∧EL
+%        B true
 
 
 
