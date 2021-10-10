@@ -1,0 +1,3 @@
+structure Parse =
+struct
+end

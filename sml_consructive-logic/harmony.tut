@@ -1,55 +1,4 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% some examples
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-proof contractoin : A & A => A =
-begin
-[ A & A;        % assumtion
-  A ];          % via elimination
-A & A => A;     % conclusion
-end;
-
-proof drop : A => B => A =
-begin
-[ A;
-  [ B; A ];
-  B => A
-];
-A => B => A;
-end;
-
-proof impDef : (~A|B) => A => B =
-begin
-[ (~A | B);
-  [ A;
-    [ ~A; F; B ];
-    [ B; B ];
-    B;
-  ];
-  A => B
-  ];
-(~A|B) => A => B;
-end;
-
-% truth in constructive logic: ⊢⊤ true
-
-% falsehood in constructive logic: ⊥ has no proof.
-% from falsehood we can prove anything: ⊥ true⊢C true.
-% negation : ~A=A⊃⊥. meaning, if ~A is true, the assumpton A is contradictory.
-
-proof dnLem : ~~(A | ~A) =
-begin
-[ ~(A | ~A);
-  [ A;
-    A | ~A;
-    F ];
-  ~A;
-  A | ~A;
-  F ];
-~~(A | ~A);
-end;
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % HARMONY
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Introduction and elimination rules come in harmony:
@@ -106,9 +55,21 @@ $     (local reduction of deduction D to D' of same judgement A true)
 %   verfication: a proof that only analyzes the constituent of a proposition.
 %   if a verification is allowed to analyze things outside of it's scope it's
 %   possible to create a circular dependency, and we try to avoid that.
-%   A↑ means A has a verification, which means it's true.
-%
+%   A↑ means A has a verification.
+%   Just fyi, A↑ ⊃ A true and the converse is true. We will prove this point
+%   later.
 
+% e.g Verifictaion for conjunction:
+%   A↑  B↑
+%  ------- ∧I
+%    A∧B↑
 
+% uses
+%   written as A↓, indicates A might be used in the following inferences.
 
+% Verification and uses meet at ⊃Iᵘ and ⊃E
 
+% Global soundness and global completeness.
+
+% Intuionistic logic in a nut shell: Separating judgement from proposition and
+%   taking a verfiicationist point of view in definition of logical connectives

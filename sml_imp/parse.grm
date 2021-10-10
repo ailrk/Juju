@@ -1,0 +1,39 @@
+structure A = Absyn
+
+%%
+%eop EOF
+%verbose
+%pure
+%name Imp
+
+%term
+      EOF
+    | ID of string
+    | INT of int
+    | ADD | SUB | MUL | LE | AND | OR | EQ
+    | IFELSE | WHILE | SEMICOLON
+
+%nonterm
+      toplevel of A.comb list
+    | statement_list of A.comb list
+    | statement of A.comb
+    | arith_expr of A.axpr
+    | bool_expr of A.bexpr
+    | loc of A.loc
+
+%right ASSIGN
+%left Or
+%left And
+%left Eq
+%left Le
+%left Add Sub
+%left Mul
+%pos int
+
+%noshift EOR
+
+toplevel : statements (statements)
+statement_list : statement statement_list (statement::statement_list)
+               | ([])
+
+statement : WHI

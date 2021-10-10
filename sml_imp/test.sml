@@ -1,0 +1,3 @@
+structure Test =
+struct
+end
