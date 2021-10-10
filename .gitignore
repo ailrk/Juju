@@ -399,7 +399,7 @@ a.out
 .clangd/
 .cmake/
 .cm/
-*.mlb
+# *.mlb
 *.du
 *.ud
 
