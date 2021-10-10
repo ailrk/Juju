@@ -399,9 +399,9 @@ a.out
 .clangd/
 .cmake/
 .cm/
-.mlb
-.du
-.ud
+*.mlb
+*.du
+*.ud
 
 out*.asm
 
