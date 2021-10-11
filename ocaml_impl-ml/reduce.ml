@@ -189,3 +189,69 @@ module EvalContext = struct
 
   let eval e = let c, t = eval_context e in c (top_reduction t)
 end
+
+
+(* Big step semantics
+
+   small step semantics (reduction semantics) is concise and modular. But it
+   has some drawbacks:
+     1. values are subset of programs
+     2. poor performance.
+
+  Introducing big step sematnics: program evaluated in an environment. We
+  can jump to conclusion instead of following reduction steps precisely.
+
+  ρ := ∅ | ρ, x → v
+  v := ⟨ λx. a, ρ⟩ | Cⁿ v₁‥vₙ | cⁿ v₁‥vₖ where k < n
+  r : v | error
+
+  Big step semantics are defined by a set of inference rules that the language
+  has. Some inferences can lead to errors.
+  Actually we can categorize rules in to 3 groups:
+    1. eval rules
+    2. error rules
+    3. error propagatoin
+
+    ρ ⊢ a ⇓ v                             ρ ⊢ a ⇓ error
+   --------------eval-const           ------------------ eval-const-error
+   ρ ⊢ C¹ a ⇓ C¹ v                      ρ ⊢ c a ⇓ error
+
+  ρ⊢a⇓V    f¹ v→v'                      ρ⊢a⇓V    f¹ v→~v'
+  ---------------eval-prim              ---------------eval-error
+    ρ⊢f¹ a ⇓ v'                           ρ⊢f¹ a ⇓ error
+
+      z∈Dom(ρ)
+   ----------------eval-var       ------------------ eval-fun
+     ρ ⊢ z⇓ρ(z)                       e ⊢ λx.a ⇓ ⟨λx. a, ρ⟩
+
+    ρ ⊢ a ⇓ ⟨λx.a₀, ρ₀⟩     ρ⊢a'⇓v    ρ₀, x→v⊢a₀:v'
+   ------------------------------------------------ eval-app
+                ρ⊢ a a' ⇓ v'
+
+    ρ⊢a ⇓ C₁ v₁                         ρ⊢a⇓ error
+   -------------- eval-app-error     ---------------- eval-app error left
+   ρ⊢a a' ⇓ error                       ρ⊢a a' ⇓ error
+
+          ρ⊢a⇓⟨λx.a₀, ρ₀⟩         ρ⊢a' ⇓ error
+   ---------------------------------------------- eval-app-error-right
+              ρ⊢a a' ⇓ error
+        ρ⊢a ⇓ v           ρ, x→v ⊢a'⇓v'
+    --------------------------------------- eval-let
+          ρ ⊢let x = a in a' ⇓ v'
+
+        ρ⊢a ⇓ error
+    --------------------------- eval-let-error
+      ρ⊢let x = a in a' ⇓ error
+
+ *)
+
+module BigStep = struct
+  type env = (string * value) list
+  and value =
+    | Clos of var * expr * env
+    | Const of constant * value list
+  type answer = Error | Value of value
+
+
+end
+
