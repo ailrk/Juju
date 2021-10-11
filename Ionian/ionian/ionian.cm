@@ -2,9 +2,11 @@ Group is
   $/basis.cm
   $/smlnj-lib.cm
   $/ml-yacc-lib.cm
-  impl.lex
+  ionian.lex
   parser.grm
   absyn.sml
   parse.sml
   test.sml
   error.sml
+  token.sig
+  token.sml
