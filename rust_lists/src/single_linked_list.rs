@@ -37,6 +37,32 @@ impl<T> List<T> {
         self.head.as_mut().map(|node| &mut node.elem)
     }
 
+    // a -> b -> c
+    pub fn remove(&mut self, i: usize) {
+        let mut count = i;
+        if i < 1 {
+            self.pop();
+        } else {
+            macro_rules! take {
+                ( $node:tt) => {
+                    $node.next.take()
+                };
+            }
+            while let Some(boxed_node) = &mut self.head {
+                if count == 1 {
+                    take!(boxed_node).map(|mut node1| {
+                        take!(node1).map(|mut node2| {
+                            node1.next.take();
+                            boxed_node.next = Some(node2);
+                        });
+                    });
+                    break;
+                }
+                count -= 1;
+            }
+        }
+    }
+
     pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
@@ -132,6 +158,20 @@ mod test {
         assert_eq!(*list.peek().unwrap(), 2);
         *list.peek_mut().unwrap() = 3;
         assert_eq!(*list.peek().unwrap(), 3);
+        list = simple_list!();
+    }
+
+    #[test]
+    fn ops() {
+        let mut list = List::new();
+        for n in list.iter() {
+            print!("{:?}", n)
+        }
+        list.push(1);
+        list.push(2);
+        list.push(3);
+        list.remove(1);
+        verfiy!(list.iter(), [3, 2]);
     }
 
     #[test]

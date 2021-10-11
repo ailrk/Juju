@@ -53,21 +53,6 @@ impl<T> List<T> {
         self.head.as_mut().map(|node| &mut node.elem)
     }
 
-    // a -> b -> c
-    pub fn remove(&mut self, i: usize) {
-        let mut count = i;
-        while let Some(boxed_node) = &mut self.head {
-            if i == 1 {
-                boxed_node.next.take().map(|mut node1| {
-                    node1.next.take().map(|mut node2| {
-                        node1.next.take();
-                        boxed_node.next = Some(node2);
-                    });
-                });
-            }
-        }
-    }
-
     pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
@@ -123,63 +108,5 @@ impl<'a, T> Iterator for IterMut<'a, T> {
             self.next = node.next.as_deref_mut();
             &mut node.elem
         })
-    }
-}
-
-
-#[cfg(test)]
-mod test {
-    use super::List;
-
-    macro_rules! simple_list {
-        () => {{
-            let mut tmp = List::new();
-            tmp.push(1);
-            tmp.push(2);
-            tmp
-        }};
-    }
-
-    macro_rules! verfiy {
-        ( $iter:expr, $n:tt ) => {
-            $iter.zip($n.into_iter()).map(|(&l, r)| {
-                assert_eq!(l, r);
-            });
-        };
-    }
-
-    #[test]
-    fn basic() {
-        let mut list = simple_list!();
-        assert_eq!(list.pop().unwrap(), 2);
-        assert_eq!(list.pop().unwrap(), 1);
-        assert_eq!(list.pop(), None);
-        list = simple_list!();
-        assert_eq!(*list.peek().unwrap(), 2);
-        assert_eq!(*list.peek().unwrap(), 2);
-        *list.peek_mut().unwrap() = 3;
-        assert_eq!(*list.peek().unwrap(), 3);
-    }
-
-    #[test]
-    fn iters() {
-        {
-            let mut list = simple_list!();
-            let iter = list.iter();
-            verfiy!(iter, [2, 1]);
-        };
-
-        {
-            let mut list = simple_list!();
-            let mut iter = list.iter_mut();
-            for n in iter {
-                *n = 0;
-            }
-            verfiy!(list.iter(), [0, 0]);
-        };
-
-        {
-            let mut list = simple_list!();
-        };
     }
 }

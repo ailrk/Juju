@@ -1,4 +1,4 @@
-use super::unsafe_queue::*;
+use super::single_linked_list::*;
 use std::mem::transmute;
 
 // Extensible hashtable. (Ronald Fagin)
@@ -75,8 +75,10 @@ where
             .iter()
             .enumerate()
             .filter(|(i, (k, v))| key == *k)
-            .map(|(i, _)| i);
+            .map(|(i, _)| i)
+            .collect::<Vec<_>>();
 
+        dup.iter().map(|n| self.bucket.remove(*n));
     }
 }
 
