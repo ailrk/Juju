@@ -1,5 +1,5 @@
-open Eval
-
-module SteppedEval : Eval
-module RecDecentEval : Eval
-module EvalContextEval : Eval
+open Syntax
+module type SmallStepEval = sig val eval : expr -> expr end
+module Stepped : SmallStepEval
+module RecDecent : SmallStepEval
+module EvalContext : SmallStepEval

@@ -1,15 +1,14 @@
 open Syntax
+type env = (string * value) list
+and value =
+  | Closure of var * expr * env
+  | Constant of constant * value list
+type result = Error | Value of value
 
-module BigStep = struct
-  type env = (string * value) list
 
-  (* value and program are separated *)
-  and value =
-    | Closure of var * expr * env
-    | Constant of constant * value list
+module type BigStepEval = sig val eval : env -> expr -> result end
 
-  type result = Error | Value of value
-
+module BigStep : BigStepEval = struct
   let val_int u =
     let const = { name = Int u; constr = true; arity = 0 }
     in Value (Constant (const, []))
@@ -28,7 +27,7 @@ module BigStep = struct
 
   let get x env = try Value (List.assoc x env) with Not_found -> Error
 
-  let rec eval (env: (string * value) list) = function
+  let rec eval env = function
     | Var x -> get x env
     | Const c -> Value (Constant (c, []))
     | Fun (x, e) -> Value (Closure (x, e, env))

@@ -1,9 +1,10 @@
 open Reduce
 open Syntax
 
-module type Eval = sig val eval : expr -> expr end
+module type SmallStepEval = sig val eval : expr -> expr end
+module type Eval = SmallStepEval
 
-module SteppedEval : Eval = struct
+module Stepped : Eval = struct
   let rec eval = function
     | App (a1, a2) when not (evaluated a1)-> App (eval a1, a2)
     | App (a1, a2) when not (evaluated a2)-> App (a1, eval a2)
@@ -11,7 +12,7 @@ module SteppedEval : Eval = struct
     | a -> reduce a
 end
 
-module RecDecentEval : Eval = struct
+module RecDecent : Eval = struct
   let rec eval =
     let eval_top_reduce a = try eval (reduce a) with Reduce -> a in
     function
@@ -25,17 +26,8 @@ module RecDecentEval : Eval = struct
       | a -> eval_top_reduce a
 end
 
-module EvalContextEval = struct
-  module type ZIPPER = sig
-    type v
-    type context = v -> v
-    val hole: context
-    val appL: v -> v -> v
-    val appR: v -> v -> v
-    val letL: var -> v -> v -> v
-    val ( ** ): ('a -> 'b) -> ('c -> 'a) * 'd -> ('c -> 'b) * 'd
-  end
-  module MLZipper : ZIPPER with type v = expr = struct
+module EvalContext = struct
+  module MLZipper = struct
     type v = expr
     type context = v -> v
     let hole = fun t -> t

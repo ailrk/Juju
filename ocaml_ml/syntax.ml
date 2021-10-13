@@ -1,9 +1,3 @@
-(* Lambda calclus core with let binding
-   expr ::= λx.a | a a | c | let x = a in a
-      c ::= [...]  C constructors
-          | [...] f primites
-*)
-
 type name = Name of string | Int of int
 type constant = { name: name; constr: bool; arity: int }
 type var = string

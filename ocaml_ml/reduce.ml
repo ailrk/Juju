@@ -1,5 +1,4 @@
 open Syntax
-
 exception Reduce
 
 let rec evaluated = function
