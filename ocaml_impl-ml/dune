@@ -1,7 +1,0 @@
-(library
- (name impl_ml)
- (modules "reduce"
-          "test"
-          "unify"
-          "syntax"
-          "util"))
