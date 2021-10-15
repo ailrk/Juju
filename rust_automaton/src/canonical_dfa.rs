@@ -39,6 +39,4 @@ impl DFA {
     fn hopcroft(&mut self) {
         todo!()
     }
-
-
 }

@@ -22,13 +22,19 @@ __[relation L~]__: x L~ y iff there is no distinguishing extensions z.
          y
 ```
 [lemma2]: if xz, yz goes to same state, x, y either
+
 [lemma3]: if xz, yz don't go to same state, neither x, y
-[lemma4]: if infinitely many z such that forall x ≠ y, xz, yz go to different state, L is not regular.
+
+NOTE: if xz, yz don't go to same state, they go to some different states.
+
+[lemma4]: if infinitely many distinguishing extension z such that forall x ≠ y, xz, yz go to different state, L is not regular.
+
+Proof: First note that xz, yz go to to different states. Lets assume xz goes to state Sx, yz goes to state Sy. For inifinite many k, we have infinite many pairs of (Sxᵢ, Syᵢ) that Sxᵢ ≠ Syᵢ. That means we need infinite number of states. But regular languages have finite states, absurd ∎
 
 #### Pummping lemma can't prove L = a* ∪ { aᵐbⁿ : m > n }
 It's a non regular langauge that pummping lemma can't prove.
 
-Pummping lemma says a regular langauge satisfies: for a regular language L, there exists a integer p such that for all string w in L, we can write the string like xyz, that |y| > 1, |xy| ≤ p, and forall n ≥ 0, xyⁿz in L. o
+Pummping lemma says a regular langauge satisfies: for a regular language L, there exists a integer p such that for all string w in L, we can write the string like xyz, that |y| > 1, |xy| ≤ p, and forall n ≥ 0, xyⁿz in L.
 
 So to prove something is a regular language, we need to use the contrapositive of the lemma, that is, if a langauge does not satisified aforementioned conditions, it's not a regular langauge.
 
@@ -44,3 +50,4 @@ Why not the previous example? Because this is easy :0
 Let Z = 0* = {0, 00, 000, ...}
 
 let x = 0ⁱ, y = 0ʲ, where i ≠ j. let z = 1ʲ. So xz = 0ⁱ1ʲ ∉ L, yz = 0ʲ1ʲ ∈ L. Thus there are infinite many distinguishing extension z ∈ Z such that only one of xz and yz in L. Thus L is non regular by lemma(4). ∎
+
