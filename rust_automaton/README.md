@@ -1,3 +1,3 @@
 # Automatons
 
-some automaton algorithms.
+Some automaton and graph algorithms.

@@ -1,8 +1,8 @@
-struct Stream {
-}
+use super::dfa;
 
+// semantic actions being generating filling the delta hashmap.
 struct Parser {
+    position: u32,
 }
 
-struct Table {
-}
+
