@@ -13,4 +13,4 @@ To get R/L, let M be a DFA for R. We can change final states of M to be all stat
 
 For x ∈ R, if ∃y∈L, such that xy ∈ R and xy hits the final state of R, let's say x hit a statet called q, then we know first x needs need to be accepted in langauge R/L, that means q needs to be the final state in R/L.
 
-Another way to look at it is that L only chop off y part of the string in xy from hehind, leave the first part x which is itself in a regular language. The resulting langauge R/L now accept a smaller string x instead of xy, but the previous x part is still regular.
+Another way to look at it is that L only chop off y part of the string in xy from hehind, leave the first part x which is itself in a regular language. The resulting langauge R/L now accept a smaller string x instead of xy, but the part of automata M from the initial state q0 up to the state that accepts x is still regular.

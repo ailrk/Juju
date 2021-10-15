@@ -29,7 +29,6 @@ library
       FAlgebra
       FreeMonad
       FreeMonid
-      FreeMagma
       LimitsAndColimits
       NaturalTranformation
       GroupoidAndSmallCategory

@@ -26,7 +26,6 @@ impl automaton::DFA {
     }
 
     fn merge_nondistinguishable(&self) -> HashSet<char> {
-
         todo!()
     }
 }

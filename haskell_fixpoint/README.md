@@ -1,37 +1,11 @@
-{-# LANGUAGE DeriveFunctor #-}
+# Fix point, Free monad, and adjoints.
 
-module FixPoint where
+#### Fix Point Of Functor
+Sometimes we have recursive types. E.g binary tree
 
-import           Control.Arrow
+We can abstract away the recursive part with universal type. To make it recursive again we find the fix point of the data type.
 
-{-@ Fix Point Of Functor
-    Sometimes we have recursive types. E.g binary tree
-
-    We can abstract away the recursive part with universal type.
-    To make it recursive again we find the fix point of the data type.
-
-    doing so is desiable when you want to separate the primitive representation
-    of a data type and it's recursive form.
-@-}
-
-data Lit
-  = StrLit String
-  | IntLit Int
-  | Ident String
-  deriving (Show, Eq)
-
-
--- e.g one way to define Unary might be `Unary String Expr`. We abstract away the
--- Expr part and turns it into a universal type.
-data Expr a
-  = Index a a
-  | Call a [a]
-  | Unary String a
-  | Binary a String a
-  | Paren a
-  | Literal Lit
-  deriving (Show, Eq, Functor)
-
+doing so is desiable when you want to separate the primitive representation of a data type and it's recursive form.
 
 -- use a fix point to tight the recursive knot.
 -- What does it mean?
@@ -43,22 +17,6 @@ data Expr a
 -- Note the original Expr a is not recurisve at all.
 
 -- We are just using the Fix type to create a recursive type externally.
-data Fix f = In (f (Fix f))
-
--- out is a helper function to evaluate the Term f
-out :: Fix f -> f (Fix f)
-out (In t) = t
-
-
-n = let term = In (Binary (In (Paren (In (Literal (IntLit 3)))))
-                           "+"
-                           (In (Binary (In (Binary (In (Literal (IntLit 3)))
-                                           "*"
-                                           (In (Literal (IntLit 10)))))
-                                        "-"
-                                        (In (Literal (IntLit 10))))))
-      in out term
-
 
 {-@ Conclusion
 
@@ -111,3 +69,7 @@ n = let term = In (Binary (In (Paren (In (Literal (IntLit 3)))))
           how deep the data type is nested, as long as it's a instance of the fixed point
           of the type it will tye check.
 @-}
+
+##### references
+- https://stackoverflow.com/questions/17307416/difference-between-free-monads-and-fixpoints-of-functors
+- https://ncatlab.org/nlab/show/adjoint+functor+theorem
