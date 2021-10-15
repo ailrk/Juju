@@ -1,0 +1,3 @@
+# Automatons
+
+some automaton algorithms.

@@ -13,7 +13,6 @@ sig
   val reset : unit -> unit
 end
 
-
 structure Error : ERROR =
 struct
   val hasError = ref false
