@@ -2,7 +2,9 @@
 {-# LANGUAGE StandaloneDeriving       #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 
-module BidirectionalTC.TC3 where
+module BidiectionalTypeChecking where
+
+
 
 -- Stil the same birectional algorithm, but this time we want to be able to
 -- reuse the result of one subproblem on another.

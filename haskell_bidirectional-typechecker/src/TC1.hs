@@ -1,4 +1,4 @@
-module BidirectionalTC.TC1 where
+module TC1 where
 
 
 -- Problem:

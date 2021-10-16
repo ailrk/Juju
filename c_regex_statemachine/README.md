@@ -1,8 +1,8 @@
 # Regex engine compile to a table.
 
-Every regular expression corresponds to a deterministic finite automata (DFA). A DFA essentially is a directed graph that each vertex is labeled by type "State", and each edge is labeled by "Symbol". In additional to that, all DFA has an initial state and a set of final state we can go to. Formally we can define a DFA as a five tuple: `(Q, ∑, q₀, δ, F)`.
+Every regular expression corresponds to a deterministic finite automata (DFA). A DFA essentially is a directed graph that each vertex is labeled by type "State", and each edge is labeled by "Symbol". In addition, all DFA has an initial state and a set of final state we can go to. Formally we can define a DFA as a five tuple: `(Q, ∑, q₀, δ, F)`.
 
-What makes a DFA alive is the transition function delta. δ: ∑ × Q → Q. At each moment we look at our current state and the symbol, and delta tells us what next state we should go to. There are lots of way to think about it. You can think of a state as it's own equivalence class that holds all strings that that state can accept.
+What makes a DFA alive is the transition function delta. δ: ∑ × Q → Q. At each moment we look at our current state and the symbol, and delta tells us what next state we should go to. There are lots of way to think about it. You can think of a state as it's own equivalence class with all strings that that state can accept. (A state is an equivalence class, two states accept the same set of string are the same state.)
 
 A regular expression engine is a regular expression to state machine compiler. We want to find a a way to build up the delta function at runtime. One way to do this is to create nesting closures, everytime we add a new transtion, we wrap over. On call, we check if we know how to handle the input parameter. If we do, handle it. Otherwise, we pass it to the next layer. Another way is to compile the state machine into 2d table indexed by the current state and current symbol. This is simple and powerful, but also very wasteful. The best way to implement delta function maybe a hashmap, but we want to keep it simple.
 
@@ -17,6 +17,6 @@ term1 = term { term }
 expression = term1 { "|" term1 }
 ```
 
-To make things simple, this is a tree walk interpreter. Once the parser build the ast, we walk over the tree with preorder traversal, and modifying the 2d array according to what we see along the way. One the table is build, it's trivial to check if it accepts a string. All we need to do is to trace over the mapping and see if we end up in one of the final state.
+To make things simple, this is a tree walk interpreter. Once the parser build the ast, we walk over the tree with preorder traversal, and modifying the 2d array according to what we see along the way. Once the table is build, it's trivial to check if it accepts a string. All we need to do is to trace over the mapping and see if we end up in one of the final state.
 
 One optmization we can do is to do a dfa minimization to reduce the table to it's minimal size. We know any dfa has an unique minimal dfa, this is due to myhill rehode relation: Number of states in the minimal dfa is the number of equivalence classes. And we can merge nondistinguishable states that are in the same equivalence class.

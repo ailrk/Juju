@@ -25,9 +25,8 @@ library
     exposed-modules:
       Refinement1
       Refinement2
-      BidirectionalTC.TC1
-      BidirectionalTC.TC2
-      BidirectionalTC.TC3
+      BidirectionalTypeChecking
+      TC1
 
     -- Modules included in this library but not exported.
     -- other-modules:
