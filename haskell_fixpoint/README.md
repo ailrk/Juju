@@ -1,6 +1,4 @@
-# Fix point, Free monad, and adjoints.
-
-#### Fix Point Of Functor
+# Y Combinators, Fix point, Free monad, Recursion scheme
 
 ##### references
 - https://stackoverflow.com/questions/17307416/difference-between-free-monads-and-fixpoints-of-functors

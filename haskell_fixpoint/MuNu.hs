@@ -3,9 +3,10 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
 module MuNu where
+class Injective a b where to :: a -> b
+class (Injective a b, Injective b a) => Iso a b
 
 -- Recursion scheme
-
 class FixPoint f n  where
   out :: f -> n
   into :: n -> f
@@ -26,9 +27,14 @@ instance Functor f => FixPoint (Mu f) (f (Mu f)) where
 
 -- recursive type as its unfold (coinductive infinite data)
 -- it's the terminal fix point of f.
-data Nu f where Nu ::  (a -> f a) -> a -> Nu f
+data Nu f = forall a. Nu  (a -> f a) a
+
 instance Functor f => FixPoint (Nu f) (f (Nu f)) where
   into = Nu (fmap out)
   out (Nu f a) = Nu f <$> f a
 
 --------------------------------------------------------------------------
+-- mu, nu are isomorphic
+
+instance Injective (Mu f) (Nu f) where
+  to (Mu f) = undefined
