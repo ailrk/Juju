@@ -19,19 +19,8 @@ char *sp;    // stack pointer.
 int state;   // current state.
 
 // This regualr expression library supports matching 128 long
-// ascii string.
-//
-// A regular expression engine is essentially a regular expression to
-// state machine compiler. Given a langauge ∑ and a set of states Q,
-// we have transition function δ: ∑ × Q → Q. That is, the state machine
-// is a 2d table indexed by the current state and current symbol.
-//
-// nd Array is actually curried functions, fully applied nd array gives
-// us the final mapping. In this case is the next state the machine goes
-// to.
-//
-// So another view of regex engine is that we're building the arity 2
-// mapping functions before hand so we can use it afterwards.
+// ascii string only.
+
 char table[MAX_SYM_NUM][MAX_STATE_NUM];
 
 // The size of final state is unkown untill we get the reuslt, so the final
