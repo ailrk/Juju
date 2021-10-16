@@ -1,12 +1,23 @@
-use std::collections::HashSet;
 use super::automaton;
+use std::collections::HashSet;
 // Regular languages have minimal automaton (canonical dfa) that accept it.
 // we can convert any dfa to it's canonical form by triming unecssary states.
+// hopcroft is used to remove nondistinguishable nodes.
 
-// fn hopcroft(&mut self) {
+// (1 2 3) (1 2)
+struct PRefinement<T>(Vec<HashSet<T>>);
+
+impl<T> PRefinement<T>
+where
+    T: Eq,
+{
+    fn refine(&mut self) {
+
+    }
+}
+
 
 impl automaton::DFA {
-
     fn get_unreachable(&self) -> HashSet<char> {
         let mut front_states = HashSet::from([self.q0]);
         let mut reachable_states = HashSet::from([self.q0]);
@@ -24,8 +35,6 @@ impl automaton::DFA {
         }
         &self.q - &reachable_states
     }
-
-    fn merge_nondistinguishable(&self) -> HashSet<char> {
-        todo!()
-    }
 }
+
+

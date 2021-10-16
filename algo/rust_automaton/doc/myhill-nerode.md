@@ -2,16 +2,16 @@
 
 Myhill nerode theory is another theory that can be used to check regular language. Comparing with pumping lemma, it's more powerful in terms that it can identify non langauges that pummping lemma cannot.
 
-The key insight: each state in a dfa represents a set of string that it accepts, which can be thought as an equivalence class. If we have infinite many equivalence classes, then we have inifnite many states, but regular languguage only have finite states. Thus contradict.
+The key insight: each state in a dfa represents a set of string that it accepts. If it accepts both string x and y, then x and y are sort equivalent given that they are in the same langauge determined by the state. Thus for a state q and a string x that it accepts, x forms a equivalence class [x] that congruence to all other strings that state q accept. If we have infinite many equivalence classes, then we have inifnite many states, but regular languguage only have finite states. Thus contradict.
 
-To check wheather a langauge is regular we can try to construct inifinte many equivalence classes.
+So the tehncique for checking wheather a language is regular we can try to construct inifinte many equivalence classes.
 
-The idea of states being equivalence relation is useful in many other areas. If we know two states are in the same equivalence class, we call them `non distinguishable states`, thus we can eliminate one of it to make the dfa smaller. This is one important step to generate `canonical dfa (minimal dfa)`.
+The idea of states represents equivalence relation of strings is very useful. If we know two states are in the same equivalence class, we call them `non distinguishable states`, thus we can eliminate one of it to make the dfa smaller. This an important step to generate `canonical dfa (minimal dfa)`.
 
 __distinguishing extension__:
 given language L, for string x, y if there exists a string z such that xz in L or yz in L.
 
-__relation L~__: x L~ y iff there is no distinguishing extensions z.
+__relation L~__: x L~ y iff there is no distinguishing extensions z. `∀a∈L, [a] = { x∈S | x L~ a }`
 
 - L is regular iff L~ has finite number of equivalence classes.
 - number of L~ is the minimal dfa.
@@ -74,10 +74,8 @@ So to remove nondistinguishable states meaning merging states in the same equiva
 
 This is important because we need to do this to get minimize (canonical) dfa.
 
-#### Algorithm for getting Canonical dfa
+## Reference
 
-A dfa can have unecessary states. We alreay discussed that it can have nondistinguishable states falls in the same equivalance class. Also there will be states can never been reached from the initial state. Removing all theses states we can get one unique canonical form of the dfa that accept the same langauge.
-
-To eliminate unreachable nodes, we maintain a set of reachable nodes. At the beginning the set only have initial node. Each step we check the next states from the current reachable states (by applying delta to each reachable state and all symbols in the language). If it's a new state, we add it into the set. Repeat until there is no more new states. (For performance, we can add the concept front state, which are only new states found from the last iteration, thus we don't need to check all reachable states)
-
-To eliminate nondistinguishable states, we perform parition refinement on states, which shoves states in the same equivalance class into the same partition, then merge all states in the same parition.
+- https://en.wikipedia.org/wiki/Myhill%E2%80%93Nerode_theorem
+- https://en.wikipedia.org/wiki/Pumping_lemma_for_regular_languages
+- http://www.cs.columbia.edu/~tal/3261/sp18/MyhillNerode.pdf
