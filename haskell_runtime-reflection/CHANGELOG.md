@@ -1,4 +1,4 @@
-# Revision history for haskell-netpbm-handle
+# Revision history for haskell-runtime-reflection
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

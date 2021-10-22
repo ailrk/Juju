@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               haskell-netpbm-handle
+name:               haskell-runtime-reflection
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -23,35 +23,16 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:
-      NetPBM
+      Dyn
+      CloseDyn
+      Type
+      TyCon
 
     -- Modules included in this library but not exported.
-    other-modules:
-      NetPBM.Handle
-      NetPBM.Canvas
-      NetPBM.Format
+    -- other-modules:
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:
-      base ^>=4.14.1.0,
-      bytestring,
-      text,
-      vector
-
-    hs-source-dirs:   src
+    build-depends:    base ^>=4.14.1.0
+    hs-source-dirs:   .
     default-language: Haskell2010
-
-test-suite test1
-  type:                exitcode-stdio-1.0
-  default-language:    Haskell2010
-  other-modules: Paths_haskell_netpbm_handle
-  other-modules:
-      Paths_haskell_netpbm_handle
-  hs-source-dirs:      test
-  main-is:             Main.hs
-  build-depends:
-      base >=4.13 && <5
-    , haskell-netpbm-handle
-    , hspec
-    , transformers
