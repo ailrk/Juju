@@ -7,14 +7,9 @@ module NaturalTranformation where
 
 import           Data.Kind
 
--------------------------------------------------------------------------------
--- Monad
--------------------------------------------------------------------------------
---  - endofunctor               T: X -> X
---  - natural transformation   mu: T x T -> T
---  - natural transformation   nu: I -> T
---  where   mu(mu(T x T) x T) = mu(T x mu(T x T))
---          mu(nu(T)) = T = mu(T(nu))
+-- Natural transformation
+type (:->) :: (Type -> Type) -> (Type -> Type) -> Type
+newtype f :-> g = NaturalTransfrom { eta :: forall x. f x -> g x }
 
 -------------------------------------------------------------------------------
 -- Functor:
@@ -37,7 +32,6 @@ import           Data.Kind
 type Identity :: Type -> Type
 newtype Identity a = Identity { runIdentity :: a }
 
--- we define how the functor map from object to object.
 instance Functor Identity where
   fmap f (Identity a) = (Identity (f a))
 
@@ -70,16 +64,12 @@ return' = NaturalTransfrom (return . runIdentity)
             | f         | F(f)              | G(f)
             |           |                   |
             v           v       nuY         v
-            Y          F(y) -------------> G(Y)
+            Y          F(Y) -------------> G(Y)
 
     There is only one category in haskell, functor only maps from type to
     type. Thus natrual transformation only map function from type to type to
     function from type to type.
 -}
-
--- Natural transformation
-newtype (f :: Type -> Type) :-> (g :: Type -> Type) =
-  NaturalTransfrom { eta :: forall x. f x -> g x }
 
 listToMaybe :: [] :-> Maybe
 listToMaybe = NaturalTransfrom go

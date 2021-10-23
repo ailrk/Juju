@@ -28,11 +28,14 @@ library
       Endomorphism
       FAlgebra
       FreeMonad
-      FreeMonid
+      FreeMonoid
       LimitsAndColimits
       NaturalTranformation
       GroupoidAndSmallCategory
       Iso
+      Functor
+      Monad
+      Monoid
 
     -- Modules included in this library but not exported.
     -- other-modules:
