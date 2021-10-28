@@ -12,13 +12,11 @@ import           Data.Type.Equality
 
 -- the idea is defining indexed TypeRep. it's not extensible, so
 --  it's called closed world.
-data TypeRep (a :: k) where-- Note the polymorphic kind, important for splitApps
+data TypeRep (a :: k) where -- Note the polymorphic kind
   TBool :: TypeRep Bool
   TInt :: TypeRep Int
-  TProd :: TypeRep x -> TypeRep y
-        -> TypeRep (TypeRep x, TypeRep y)
-  TSum :: TypeRep x -> TypeRep y
-       -> TypeRep (Either x y)
+  TProd :: TypeRep x -> TypeRep y -> TypeRep (TypeRep x, TypeRep y)
+  TSum :: TypeRep x -> TypeRep y -> TypeRep (Either x y)
 
 eqT :: TypeRep a -> TypeRep b -> Maybe (a :~: a)
 eqT TBool TBool = Just Refl
@@ -32,11 +30,3 @@ eqT (TSum a1 b1) (TSum a2 b2) = do
   eqT b1 b2
   return Refl
 eqT _ _ = Nothing
-
-data SomeTypeRep where SomeTypeRep :: TypeRep a -> SomeTypeRep
-
-data AppResult t where
-  App :: TypeRep a -> TypeRep b -> AppResult (a b)
-
-splitApps :: TypeRep a -> Maybe (AppResult a)
-splitApps = undefined
