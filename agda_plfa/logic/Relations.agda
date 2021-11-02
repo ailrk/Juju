@@ -6,45 +6,45 @@ open import Data.Nat using (ℕ; zero; suc; _+_; _*_)
 open import Data.Nat.Properties using (+-comm; +-identityʳ; *-comm; *-identityˡ)
 
 -- Relations --
---  note: {} means n is implicit, which gives us implicit types.
+-- Relation is generalized functions, x R y only states
+
+-- Though no global type inference, agda has implicit parameter wrapped with {}.
+
+-- here we define a well founded paritial order.
 data _≤_ : ℕ → ℕ → Set where
     z≤n : ∀ {n : ℕ} → zero ≤ n
     s≤s : ∀ {m n : ℕ} → m ≤ n → suc m ≤ suc n
 
 infix 4 _≤_
 
--- definition:
---      base case: ∀ n ∈ ℕ, zero ≤ n holds
---                 (z≤n gives he evidence that it holds)
---      inductive case: ∀ m, n ∈ ℕ, m ≤ n → suc m  ≤ suc n
---                      (s≤s takes evidence that m ≤ n holds
---                       and then gives evidence that suc m  ≤ suc n holds)
 
--- Implicit arguments --
--- implict arguments don't need to be written explicitly. They are
--- inferred by the typechecker.
+-- note how m and n are inferred.
 _ : 2 ≤ 4
 _ = s≤s (s≤s z≤n)   -- 0 ≤ ? → 0 ≤ 2 → 1 ≤ 3 → 2 ≤ 4
 
--- write the same proof explicitly
+-- this is what get inferred
 _ : 2 ≤ 4
 _ = s≤s {1} {3} (s≤s {0} {2} (z≤n {2}))
 
--- more explicitly
+
+-- you can assign implicit parameter by names.
 _ : 2 ≤ 4
 _ = s≤s  {m = 1} {n = 3} (s≤s {m = 0} {n = 2} (z≤n {n = 2}))
 
 _ : 2 ≤ 4
 
+
 -- decrease m by 1 until it hits 0.
 _ : 5 ≤ 10
 _ = s≤s (s≤s (s≤s (s≤s (s≤s z≤n))))
+
 
 _ : 3 ≤ 10
 _ = s≤s {m = 2} {n = 9}
     (s≤s {m = 1} {n = 8}
     (s≤s {m = 0} {n = 7}
     (z≤n {n = 7})))
+
 
 -- # Inversion #
 inv-s≤s : ∀ {m n : ℕ} → suc m ≤ suc n → m ≤ n
@@ -53,35 +53,10 @@ inv-s≤s (s≤s m≤n) = m≤n
 inv-z≤n : ∀ {m : ℕ} → m ≤ zero → m ≡ zero
 inv-z≤n z≤n = refl
 
--- # Properties of ordering relations #
+-- Recall partial order:
 --     reflexive:       ∀ n. the relation nRn holds
 --     transitive:      ∀ m, n. p, (mRn ∧ nRp → mRp)
 --     anti-symmetric:  ∀ m, n. mRn ∧ nRm → m ≡ n
---     total:           ∀ m, n. mRn ∨ nRm
--- ! some name for combination of common properties
---     preorder: reflexive and transitive
---     partial order: any preorder that is also anti-symmetric.
---     total order: any parital order that is also total.
---
--- To be preorder you don't need to be an equivalence relation.
---      preorder + | symmetric -> equivalence relation
---                 | antisymmetric -> partial order
-
--- exercise orderings
--- An example of a preorder that is not a partial order
---    reflexive and transitive relation but not anti-symmetric.
---    tons.
---    e.g
---    1. + (mod n)
---       not anti-symmetric because a + b (mod n) and b + a (mod n)
---       doesn't mean a = b. at all
---    2. The reachability relationship in any directed graph.
---       a can reach b but it's not necessarily for b to go back.
---    3. {(a, a), (a, b), (b, a), (b, b)} as preorder on {a, b}
--- An example of a partial order that is not a total order
---    e.g ⊆
---    It's partial order becauase  if a ⊆ b and b ⊆ a a = b
---    But not all sets are subset of each other. they can be disjoint.
 
 -- Reflexivity --
 
@@ -102,10 +77,15 @@ inv-z≤n z≤n = refl
 
 
 -- ! Total
--- first let's define what does it mean for a relation to be total
--- if ≤ is total, either m ≤ n or n ≤ m or both.
--- if we can get a instance of the data type defined below, we proved
--- it exists.
+-- total order is also called linear order. Everything relates to some other
+-- things and you have a chain that contains all elements a < b < c ...
+--   Strict Total order have
+--     irreflexsivity
+--     transitive
+--     contected        if a not = b, thne a < b or b < a
+--
+
+
 data Total (m n : ℕ) : Set where
   forward : m ≤ n → Total m n
   flipped : n ≤ m → Total m n
@@ -117,14 +97,6 @@ data Total' : ℕ → ℕ → Set where
   forward' : ∀ {m n : ℕ} → m ≤ n → Total' m n
   flipped' : ∀ {m n : ℕ} → n ≤ m → Total' m n
 
--- it's saying, give me any m and n, I can construct either m≤n
--- with is the pattern matching in agda.
--- zero cases are trivial
--- for both arguments are suc, if m n are total, (suc m) (suc n)
--- are total too.
--- It's still a recursive call on ≤-total with m n, which if m n
--- themselves are suc the same branch will be invoke again, until
--- hit one of two base cases.
 ≤-total : ∀ (m n : ℕ) → Total m n
 ≤-total zero n = forward z≤n
 ≤-total (suc m) zero = flipped z≤n
@@ -132,9 +104,7 @@ data Total' : ℕ → ℕ → Set where
 ... | forward m≤n = forward (s≤s m≤n)
 ... | flipped n≤m = flipped (s≤s n≤m)
 
-
--- equivalent to this.
--- just define a helper for pattern matching.
+-- This works the same.
 ≤-total' : ∀ (m n : ℕ) → Total m n
 ≤-total' zero n = forward z≤n
 ≤-total' (suc m) zero = flipped z≤n
@@ -143,7 +113,6 @@ data Total' : ℕ → ℕ → Set where
     go : Total m n → Total (suc m) (suc n)
     go (forward m≤n) = forward (s≤s m≤n)
     go (flipped m≤n) = flipped (s≤s m≤n)
-
 
 -- Monotonicity --
 -- is an operator monotonic with regard to the ordering?
@@ -173,11 +142,6 @@ data Total' : ℕ → ℕ → Set where
 +-mono-≤ m n p q m≤n p≤q = ≤-trans (+-monoˡ-≤ m n p m≤n) (+-monoʳ-≤ n p q p≤q)
 
 -- prove multiplication is also monotonic over ≤.
--- base case is trivial. works in a ring everything times 0 is 0.
--- inductive step. We need to somehow express multiplication in ordering even it's
--- constructor is defined with suc only.
--- we reuse monotonic + to generate the ≤ relation.
--- p + (n * p) ≤ q + (n * q) => n * p ≤ n * q ?
 *-monoʳ-≤ : ∀ (n p q : ℕ) → p ≤ q → n * p ≤ n * q
 *-monoʳ-≤ zero _ _ _ = z≤n
 *-monoʳ-≤ (suc n) p q p≤q = +-mono-≤ p q (n * p) (n * q) p≤q (*-monoʳ-≤ n p q p≤q)
@@ -208,17 +172,12 @@ data _>_ : ℕ → ℕ → Set where
 
 -- trichotomy
 -- if there is a property you want to prove, define what it is
--- as a data type and construct an instance of it!
+-- as a data type and construct an instance of it.
 data Trichotomous (m n : ℕ) : Set where
   tri< : m < n → Trichotomous m n
   tri≡ : m ≡ n → Trichotomous m n
   tri> : m > n → Trichotomous m n
 
--- another interpretation of the proving mechanism is:
---  we try to construct a instance of Trichotomous, to do that
---  we recursively call <-trichotomy m n.
---  if it terminates, which it does, we get a instance of the smaller
---  proof. Then we use that to construct the actual proof (the instance)
 <-trichotomy : ∀ (m n : ℕ) → Trichotomous m n
 <-trichotomy zero zero = tri≡ refl
 <-trichotomy zero (suc n) = tri< z<n
