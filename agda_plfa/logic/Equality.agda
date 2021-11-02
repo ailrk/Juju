@@ -1,10 +1,6 @@
 module agda_plfa.logic.Equality where
 
--- define equality
--- refl is another indexed type with implicit parameter.
--- it just take one parameter and getting the type x≡x
--- if it's possible to construct refl we can prove to types
--- are equal.
+-- simple intensional propositional equality
 data _≡_ {A : Set} (x : A) : A → Set where
   refl : x ≡ x
 

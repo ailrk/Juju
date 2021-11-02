@@ -45,11 +45,11 @@ record _×_ {l l'} (A : Set l) (B : Set l') : Set (l ⊔ l') where
 infixr 5 _,_
 infixr 1 _≡_ _⇝_ _≡!_
 
-xPath : {l l' : _} {A : Set l} {A' : Set l} {B : Set l'} {B' : Set l'} {x : A × B} {y : A' × B'}
+×Path : {l l' : _} {A : Set l} {A' : Set l} {B : Set l'} {B' : Set l'} {x : A × B} {y : A' × B'}
       → _×_.fst x ≡  _×_.fst y
       → _×_.snd x ≡  _×_.snd y
       → x ≡ y
-xPath {x = .(_×_.fst y), .(_×_.snd y)} {y = y} refl refl = refl
+×Path {x = .(_×_.fst y), .(_×_.snd y)} {y = y} refl refl = refl
 
 {-# BUILTIN REWRITE _⇝_ #-}
 
