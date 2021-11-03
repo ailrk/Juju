@@ -8,6 +8,29 @@ open import Data.Nat.Properties using (+-comm; +-identityʳ; *-comm; *-identity�
 -- Relations --
 -- Relation is generalized functions, x R y only states
 
+-- It's interesting to list relations by properties.
+--
+--    * means have, X means have the opposite prop, empty means doesn't apply
+--                             Refl       Sym     Trans      Conectedness   -
+-- Directed graph          |                                                →
+-- Undirected graph        |               *
+-- Dependency              |    *          *
+-- Tournament              |    X          X
+-- Preorder                |    *                  *                        ≤
+-- Total Preorder          |    *                  *              *         ≤
+-- Partial order           |    *          X       *                        ≤
+-- Strict partial order    |    X          X       *                        <
+-- Total order             |    *          X       *              *         ≤
+-- Strict total order      |    X          X       *              *         <
+-- Partial equivalence rel |               *       *
+-- Equivalence relation    |    *          *       *                      ~, ≡
+
+-- Note all orders are transitive. Strict orders are irreflexive, because
+-- a < b is not b < a. This force elements in the set to form a strict linear
+-- chain.
+
+-- TODO study orders
+
 -- Though no global type inference, agda has implicit parameter wrapped with {}.
 
 -- here we define a well founded paritial order.
