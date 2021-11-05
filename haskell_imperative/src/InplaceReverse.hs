@@ -27,10 +27,8 @@ declares n = sequence $ replicate n declare
 
 swapStateVar :: StateVar a -> StateVar a -> IO ()
 swapStateVar x y = do
-  xv <- get x
-  yv <- get y
-  x $= yv
-  y $= xv
+  xv <- get x; yv <- get y
+  x $= yv; y $= xv
 
 inplaceReverse :: [StateVar a] -> IO [StateVar a]
 inplaceReverse xs = do

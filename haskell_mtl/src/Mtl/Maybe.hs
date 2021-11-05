@@ -97,5 +97,3 @@ instance (Monad m) => MonadPlus (MaybeT m) where
 instance (MonadFix m) => MonadFix (MaybeT m) where
   mfix f = MaybeT (mfix (runMaybeT . f . fromMaybe bom))
     where bom = error "mfix (MaybeT): Inner computation returned Nothing"
-
-

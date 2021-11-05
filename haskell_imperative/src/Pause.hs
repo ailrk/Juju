@@ -5,15 +5,7 @@ module Pause where
 import           Control.Monad
 import           Control.Monad.Trans
 
--- pause type
 
--- what is pause?
--- a pausable action is an action that can be stopped and resumed.
--- meaning, there are two states: either being paused or finished.
---
--- if the action is finished, there is nothing left to do.
--- if it's paused, it has some undone computation left, which itself can
--- be another pausable action.
 data Pause m
  = Run (m (Pause m))    -- holds another pause with the same effect.
  | Done
@@ -30,25 +22,18 @@ pauseDemo1 = Run $ do
 
 -- how to run a pausable action?
 -- a pasuable action can be separated into different steps.
-runN' :: Monad m => MonadFail m => Int -> Pause m -> m (Pause m)
-runN' 0 p = return p
-runN' n (Run m)
+runN :: Monad m => MonadFail m => Int -> Pause m -> m (Pause m)
+runN 0 p = return p
+runN n (Run m)
   | n < 0 = fail "n < 0!"
   | otherwise = do
       a <- m
-      runN' (n - 1) a
-runN' _ Done = return Done
+      runN (n - 1) a
+runN _ Done = return Done
 
-runAll' :: Monad m => Pause m -> m ()
-runAll' Done    = return ()
-runAll' (Run m) = m >>= runAll'
-
-
--- build an action that can run for a while, pause, and resume
--- from where it paused last time.
---
--- This is a preamble of coroutine.
-
+runAll :: Monad m => Pause m -> m ()
+runAll Done    = return ()
+runAll (Run m) = m >>= runAll
 
 data PauseT m r
   = RunT (m (PauseT m r))

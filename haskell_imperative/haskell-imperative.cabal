@@ -24,6 +24,7 @@ extra-source-files: CHANGELOG.md
 library
     exposed-modules:
       CyclicReference
+      BumpAllocator
       ProducerConsumerSignal
       Pause
       InplaceReverse
