@@ -1,4 +1,8 @@
-module agda_plfa.logic.Equality where
+module logic.Equality where
+
+-- equality has a lot of subtlties with it. How can we tell two things are
+-- the same?
+
 
 -- simple intensional propositional equality
 data _≡_ {A : Set} (x : A) : A → Set where
@@ -6,17 +10,12 @@ data _≡_ {A : Set} (x : A) : A → Set where
 
 infix 4 _≡_
 
--- equality is Equivalence relation. --
--- we don't need to prove reflexivity, because ... it's alreay
--- there.
-
 sym : ∀ {A : Set} {x y : A} → x ≡ y → y ≡ x
 sym refl = refl
 
 trans : ∀ {A : Set} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
 trans refl refl = refl
 
--- congruence and substitution --
 cong : ∀ {A B : Set} (f : A → B) {x y : A} → x ≡ y → f x ≡ f y
 cong f refl = refl
 
@@ -26,7 +25,6 @@ cong2 : ∀ {A B C : Set} {f : A → B → C} {u x : A} {v y : B}
   → f u v ≡ f x y
 cong2 refl refl = refl
 
--- equality congruence in function application
 cong-app : ∀ {A B : Set} {f g : A → B}
   → f ≡ g
   → ∀ (x : A)
@@ -130,11 +128,6 @@ data even where
 data odd where
   odd-suc : ∀ (n : ℕ) → even n → odd (suc n)
 
--- we already proved addition is commutative. Also we know
--- we can have even (m + n). Thus we should be able to reuse
--- the +-comm lemma to prove commutativity for even number additions.
--- in agda you do this with rewrite.
-
 {-# BUILTIN EQUALITY _≡_ #-}
 
 even-comm : ∀ (m n : ℕ)
@@ -149,49 +142,11 @@ even-comm m n ev rewrite +-comm n m = ev
 +-comm' (suc m) n rewrite +-suc n m | +-comm' m n = refl
 
 
--- rewrite expanded
--- rewrite is just a shorthand for with.
--- this actually is equivalent with the proof above.
 even-comm' : ∀ (m n : ℕ)
   → even (m + n)
   → even (n + m)
 even-comm' m n ev with m + n | +-comm m n
 ... | .(n + m) | refl  = ev
-
--- with is more complicated than pattern macthing in most MLs.
--- you need to pattern match on indexed type too.
--- first column here assert m n has commutativity.
--- def: dot pattern: (inaccessable pattern) can be used when the only
---      type-correct value of the argument is determined by the pattern
---      given for the other argument
---
-
--- unification:
---  mechanism behind polymorphic type inference and pattern matching.
---  def : process of finding a substition that makes two given terms equal.
---  pattern matching: apply unification on expression
---  type inference:   apply unification on type expression
---
--- essence:
---  find a substitution S that unifies two given terms (make them equal).
---  thus, given s and t, we want to find S such that s S = t S
---  such S is called a unifier for s and t
---  e.g:
---    two terms:
---      f x (g y)   f (g z) w
---    with substitution
---      S = [x <- g z, w <- g y]
---    would be a unifier.
---    because
---        f x (g y) [x <- g z, w <-  g y]
---      = f (g z) w
---      = f (g z) (g y).
---      https://cs.stackexchange.com/questions/4650/unification-vs-sat-solver
---
--- 1. a unifier doesn't necessarily exists.
--- 2. if unifier exists, it doesn't necessarily unique.
--- 3. there exists a most general unifier (mgu) which is unique.
--- 4. unifiers that are not mgu are called refinement of the mgu.
 
 -- use substitution instead
 even-comm'' : ∀ (m n : ℕ)
@@ -199,25 +154,8 @@ even-comm'' : ∀ (m n : ℕ)
   → even (n + m)
 even-comm'' m n = subst even (+-comm m n)
 
--- we were using martin lof's form of equality, but there is a eailer, more naive
--- notino of equality
-
--- leibniz equality --
---  def: two objects are equal iff they satisfy the same properties
---    relevent: spock's law "a difference that make no difference is no difference"
-
--- Two terms satisfy leibniz equality iff they satisfy martin lof equalify.
-
--- define leibniz equlity x ≐ y if exists property P that P x and P y
--- P: predicates that takes A and return a Set
--- so the result of x ≐ y is actually a lambda that takes a P : A → Set,
--- a P x, and gives you a P y.
 _≐_ : ∀ {A : Set} (x y : A) → Set₁  -- using levels
 _≐_ {A} x y = ∀ (P : A → Set) → P x → P y
-
--- Levels like Set₁ forms a hierachy oftypes.
--- This way we don't need to assign Set to Set itself.
--- To avoid Russell's paradox and girard's paradox.
 
 refl-≐ : ∀ {A : Set} {x : A} → x ≐ x
 refl-≐ P Px = Px

@@ -127,7 +127,7 @@ _F∘_ : {o₁ h₁ o₂ h₂ o₃ h₃ : _}
        {C : Category o₁ h₂} {D : Category o₂ h₂} {E : Category o₃ h₃}
      → Functor D E → Functor C D → Functor C E
 
-_F∘_ {C + C} {D} {E} F G = record { F₀ = F₀ ; F₁ = F₁ ; F-id = F-id ; F-∘ = F-∘}
+_F∘_ {C = C} {D} {E} F G = record { F₀ = F₀ ; F₁ = F₁ ; F-id = F-id ; F-∘ = F-∘}
   where
     module C = Category C
     module D = Category D
@@ -146,4 +146,12 @@ _F∘_ {C + C} {D} {E} F G = record { F₀ = F₀ ; F₁ = F₁ ; F-id = F-id ; 
     F-id : {x : C.Ob} → F₁ (C.id {x}) ≡ E.id {F₀ x}
     F-id {x} =
       F.F₁ (G.F₁ C.id) ≡
-      F.F₁ ()
+      F.F₁ D.id        ≡
+      E.id             ∎
+
+    F-∘ : {x y z : C.Ob} (f : C.Hom y z) (g : C.Hom x y)
+        → (f C.∘ g) ≡ (F₁ f E.∘ F₁ g)
+    F-∘ f g =
+      F.F₁ (G.F₁ (f C.∘ g))    ≡
+      F.F₁ (G.F₁ f D.∘ G.F₁ g) ≡
+      F₁ f E.∘ F₁ g            ∎

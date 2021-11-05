@@ -1,4 +1,4 @@
-module agda_plfa.logic.Isomorphism where
+module logic.Isomorphism where
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq using (_≡_; refl; cong; cong-app)

@@ -1,4 +1,4 @@
-module algda_plfa.logic.Naturals where
+module logic.Naturals where
 
 
 data ℕ : Set where

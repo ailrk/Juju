@@ -109,7 +109,7 @@ void condition() {
     } else {
         expression();
         if (sym == eql || sym == neq || sym == lss || sym == leq ||
-            sym == gtr || sym == geq) {
+                sym == gtr || sym == geq) {
             nextsym();
             expression();
         } else {
