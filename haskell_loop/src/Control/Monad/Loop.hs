@@ -5,72 +5,129 @@
 {-# LANGUAGE RankNTypes               #-}
 {-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeFamilies #-}
 module Control.Monad.Loop where
 
+
+-- combinator -> LoopConfig -> write interpret loop config.
 
 import           Control.Concurrent
 import           Control.Exception
 import           Control.Monad
 import           Data.Kind          (Type)
 
+-- cases
+-- from i to j        -> build [i, j..1]
+-- from i to j step k -> build [i,j..k]
+-- across xs          -> build [a0, a1, ..]
+-- while              -> give [i, j..k], put in except monad, check
+--                       before calling action, if unsatisfied then break.
 
-type Loop :: (Type -> Type) -> Type -> Type
-data Loop m a where
-  From   :: Loop m a -> n -> Loop m n
-  To     :: Loop m n -> n -> Loop m (n, n)
-  Step   :: Loop m (n, n) -> n -> Loop m (n, n, n)
-  While  :: Loop m a -> (a -> Bool) -> Loop m a
+newtype IndexList n = IndexList [n]
 
-  Across :: Loop m a -> m a -> Loop m a
+type Loop :: (Type -> Type) -> Type -> Type -> Type
+data Loop m r a where
+  From   :: Integral n
+         => Loop m r a -> n
+         -> Loop m r (n -> n -> IndexList n)
 
-  Run    :: Loop m a
+  To     :: Integral n
+         => Loop m r (n -> n -> IndexList n) -> n
+         -> Loop m r (n -> IndexList n)
 
-  -- entry
-  With   :: Loop m a -> (a -> m b) -> Loop m a
+  Step   :: Integral n
+         => Loop m r (n -> IndexList n) -> n
+         -> Loop m r (IndexList n)
 
-from :: Integral n => Loop m a -> n -> Loop m n
+  While  :: Loop m r [b] -> (b -> Bool) -> Loop m r ([b], b -> Bool)
+
+  Across :: Traversable f => Loop m r a -> f a -> Loop m r (f a)
+
+  Run    :: Loop m r a
+
+  -- -- entry
+  -- With   :: Loop m a a -> (a -> m r) -> Loop m a r
+
+data SomeLoop where SomeLoop :: Loop m r a -> SomeLoop
+
+from :: Integral n
+     => Loop m r a -> n
+     -> Loop m r (n -> n -> IndexList n)
 from = From
-to :: Integral n => Loop m n -> n -> Loop m (n, n)
+
+to :: Integral n
+   => Loop m r (n -> n -> IndexList n) -> n
+   -> Loop m r (n -> IndexList n)
 to = To
-step :: Integral n => Loop m (n, n) -> n -> Loop m (n, n, n)
+
 step = Step
+
+across :: Traversable f => Loop m r a -> f a -> Loop m r (f a)
 across = Across
+
 while = While
 loop = Run
-with = With
 
--- instance Monad m => Functor (Loop m) where
---   fmap f loop = fmap f (evalLoop loop)
-
-evalLoop :: Monad m => Loop m a -> m a
+evalLoop :: Monad m => Loop m r a -> m a
 evalLoop Run = undefined
+
 evalLoop (From loop i) = do
   _ <- evalLoop loop
-  return $ i
-evalLoop (To loop j) = do
-  i <- evalLoop loop
-  return (i, j)
-evalLoop (Step loop s) = do
-  (i, j) <- evalLoop loop
-  return (i, j, s)
-evalLoop (Across loop foldable) = do
+  return $ \j s -> IndexList [i, j..s]
+evalLoop (To loop j) = ($ j) <$> evalLoop loop
+evalLoop (Step loop s) = ($ s) <$> evalLoop loop
+
+evalLoop (Across loop xs) = do
   _ <- evalLoop loop
-  foldable
-evalLoop (While loop pred) = undefined
-evalLoop (With loop k) = undefined -- evalLoop loop >>= k
+  return xs
+
+evalLoop (While loop pred) = do
+  xs <- evalLoop loop
+  return (xs, pred)
+
+-- entry
+-- with takes a function, depends on what previous value it is it
+-- pass the right funcion
+--
+-- pass a loop. step -> a -> m r, a takes [n]
+--              to -> a -> m r,   a takes n -> [n]. we wrap another layer.
+
+class With k conf | conf -> k where
+  type LoopRet k
+  with :: conf -> k -> LoopRet k
 
 
--- how do you unrow this thing?
-lang = With (To (From Run 10) 20) undefined
+-- TODO makesure index list worksthe same as normal list.
+instance (Monad m, Integral n)
+      => With (IndexList n -> m r) (Loop m r (IndexList n)) where
+  type LoopRet (IndexList n -> m r) = m r
+  with loop@(Step _ _) k = do
+    xs <- evalLoop loop
+    k xs
+  with _ _ = error "loop syntax error"
 
--- evalLoop header should give (return [10 .. 20]), we can evalLoop
--- header >>= k
+instance (Monad m, Integral n)
+      => With (IndexList n -> m r) (Loop m r (n -> IndexList n)) where
+  type LoopRet (IndexList n -> m r) = m r
+  with loop@(To _ _) k = do
+    f <- evalLoop loop
+    k (f 1)
+  with _ _ = error "loop syntax error"
 
-header = (To (From Run 10) 20)
 
--- should give us (return . \x -> [10 .. n])
-fromclause = (From Run 10)
 
-start = Run
+-- -- how do you unrow this thing?
+lang = (To (From Run 10) 20)
+header = (Step (To (From Run 10) 20) 1)
 
-xs = loop `from` 10 `to` 20 `with` \i -> do undefined
+-- -- evalLoop header should give (return [10 .. 20]), we can evalLoop
+-- -- header >>= k
+
+
+-- -- should give us (return . \x -> [10 .. n])
+-- fromclause = (From Run 10)
+
+-- start = Run
+
+-- xs = loop `from` 10 `to` 20 `step` 1 `with` \i -> undefined
