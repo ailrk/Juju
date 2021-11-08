@@ -12,25 +12,15 @@ The design is losely influenced by common lisp loop macro.
 ```haskell
 
 main = do
-  xs <- loopM (from 10 to 20 step 1 collecting) $ \i -> do
-          putStrLn . show $ i
-          i
+  -- loop over container and return ()
+  loop `across` [1, 2, 3] `with` \i -> do print i
 
-  loopM (lock all) $ \i -> do
-    ...
+  -- loop until some condition, return ()
+  loop `across` [1, 2, 3] `while` (/=10) `with` \i -> do print i
 
-  let xs' = fmap Just xs
-  loopM (while isJust across xs) $\i -> do
-    putStrLn "hi I'm just"
+  -- loop with access to index.
+  loop `across` [1, 2, 3] `iwith` \(i,v) -> do print i
 
-  loopM (let yes =
-         in while yes across xs) $ \(i, v) -> do
-    ...
-
-  loopM (fold xs from left) $ \(i, v) -> do
-    ...
-
-  loopM (fold xs from right)
-
-  loopM (whle isJust across )
+  -- loop, break out on condition
+  loop `across` [1, 2, 3] `with` \i -> do if i = 10 then break else print v
 ```
