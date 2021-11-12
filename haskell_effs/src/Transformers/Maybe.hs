@@ -1,41 +1,19 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
-module Mtl.Maybe where
+module Transformers.Maybe where
 
-import           Control.Monad        (ap, MonadPlus(..))
+import           Control.Applicative
+import           Control.Monad          (MonadPlus (..), ap)
+import           Control.Monad.Fix
+import           Control.Monad.IO.Class
 import           Data.Functor.Classes
 import           Data.Kind
+import           Data.Maybe
+import           Signatures
 import           Transformers.Class
 import           Transformers.Except
-import Control.Applicative
-import Control.Monad.Fix
-import Data.Maybe
 
 type MaybeT :: (Type -> Type) -> Type -> Type
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
-
-instance Monad m => Monad (MaybeT m) where
-  return = MaybeT . return . Just
-  {-# INLINE return #-}
-
-  m >>= f = MaybeT $ do
-    x <- runMaybeT m
-    case x of
-      Nothing -> return Nothing
-      Just a  -> runMaybeT $ f a
-  {-# INLINE (>>=) #-}
-
-instance Monad m => Applicative (MaybeT m) where
-  pure = MaybeT . return . Just
-  {-# INLINE pure #-}
-
-  (<*>) = ap
-  {-# INLINE (<*>) #-}
-
-instance Monad m => Functor (MaybeT m) where
-  fmap f m = MaybeT $ (fmap . fmap) f (runMaybeT m)
-
-instance MonadTrans MaybeT where
-  lift action = MaybeT $ (fmap Just) action
 
 -- liftting wrapped monad.
 
@@ -65,13 +43,43 @@ instance (Read1 m, Read a) => Read (MaybeT m a) where readsPrec = readsPrec1
 instance (Show1 m, Show a) => Show (MaybeT m a) where showsPrec = showsPrec1
 
 mapMaybeT :: (m (Maybe a) -> n (Maybe b)) -> MaybeT m a -> MaybeT n b
-mapMaybeT = undefined
+mapMaybeT f = MaybeT . f . runMaybeT
 
 hoistMaybe :: (Applicative m) => Maybe b -> MaybeT m b
-hoistMaybe = undefined
+hoistMaybe = MaybeT . pure
 
 maybeToExceptT :: (Functor m) => e -> MaybeT m a -> ExceptT e m a
-maybeToExceptT e (MaybeT m) = undefined
+maybeToExceptT e (MaybeT m) = ExceptT $ fmap convert m
+  where
+    convert Nothing  = Left e
+    convert (Just n) = Right n
+
+exceptToMaybeT :: (Functor m) => ExceptT e m a -> MaybeT m a
+exceptToMaybeT (ExceptT m) = MaybeT $ fmap convert m
+  where
+    convert (Left _)  = Nothing
+    convert (Right n) = Just n
+
+instance Monad m => Monad (MaybeT m) where
+  return = MaybeT . return . Just
+  {-# INLINE return #-}
+
+  m >>= f = MaybeT $ do
+    x <- runMaybeT m
+    case x of
+      Nothing -> return Nothing
+      Just a  -> runMaybeT $ f a
+  {-# INLINE (>>=) #-}
+
+instance Monad m => Applicative (MaybeT m) where
+  pure = MaybeT . return . Just
+  {-# INLINE pure #-}
+
+  (<*>) = ap
+  {-# INLINE (<*>) #-}
+
+instance Monad m => Functor (MaybeT m) where
+  fmap f m = MaybeT $ (fmap . fmap) f (runMaybeT m)
 
 instance (Monad m) => MonadFail (MaybeT m) where
   fail _ = MaybeT (return Nothing)
@@ -85,7 +93,7 @@ instance (Monad m) => Alternative (MaybeT m) where
     xv <- runMaybeT x
     case xv of
       Nothing -> return Nothing
-      Just _ -> runMaybeT y
+      Just _  -> runMaybeT y
   {-# INLINE (<|>) #-}
 
 instance (Monad m) => MonadPlus (MaybeT m) where
@@ -94,6 +102,18 @@ instance (Monad m) => MonadPlus (MaybeT m) where
   mplus = (<|>)
   {-# INLINE mplus #-}
 
+instance MonadTrans MaybeT where
+  lift = MaybeT . fmap Just
+
+instance (MonadIO m) => MonadIO (MaybeT m) where
+  liftIO = lift . liftIO
+
 instance (MonadFix m) => MonadFix (MaybeT m) where
   mfix f = MaybeT (mfix (runMaybeT . f . fromMaybe bom))
     where bom = error "mfix (MaybeT): Inner computation returned Nothing"
+
+
+-- lift for specific types.
+
+liftCallCC :: CallCC m (Maybe a) (Maybe b) -> CallCC (MaybeT m) a b
+liftCallCC callCC f = undefined

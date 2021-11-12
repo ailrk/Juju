@@ -3,7 +3,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 module InplaceReverse where
 
-
 import           Data.StateVar
 
 import           Foreign.Storable

@@ -88,5 +88,4 @@ simpleGraph = do go mknodes; go mknodesRec
           n5 <- newIORef (Node2 5 [])
       putStrLn "graph created"
       return (n0, n1, n2, n3, n4, n5)
-
     -- result : 0 1 3 2 4 5-

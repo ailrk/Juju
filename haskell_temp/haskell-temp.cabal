@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               haskell-imperative
+name:               haskell-temp
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -24,11 +24,9 @@ extra-source-files: CHANGELOG.md
 library
     exposed-modules:
       CyclicReference
-      BumpAllocator
       ProducerConsumerSignal
       Pause
       InplaceReverse
-      LinkedList
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -45,5 +43,8 @@ library
       , text
       , bytestring
       , async
+
+      , monad-control
+      , lifted-base
     hs-source-dirs:   src
     default-language: Haskell2010
