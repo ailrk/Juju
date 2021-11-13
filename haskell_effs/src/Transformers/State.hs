@@ -126,6 +126,10 @@ liftCatch catchE m h = StateT $
 
 liftListen :: Monad m => Listen w m (a, s) -> Listen w (StateT s m) a
 liftListen listen m = StateT $ \s -> do
-  ~((a, s), w) <- listen (runStateT m s)
-  return _
+  ~((a, s'), w) <- listen (runStateT m s)
+  return ((a, w), s')
 
+liftPass :: Monad m => Pass w m (a, s) -> Pass w (StateT s m) a
+liftPass pass m = StateT $ \s -> pass $ do
+  ~((a, f), s') <- runStateT m s
+  return ((a, s'), f)

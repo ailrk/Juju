@@ -1,4 +1,4 @@
-# Revision history for haskell-http-server
+# Revision history for haskell-type-gymnastics
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

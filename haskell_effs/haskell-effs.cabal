@@ -32,6 +32,8 @@ library
       Transformers.Writer
       Transformers.State
       Transformers.Maybe
+      Transformers.Select
+      Transformers.RState
 
       Mtl.Identity
       Mtl.Except
@@ -42,6 +44,9 @@ library
       Mtl.State
 
       Control.Control
+      Control.IndexedMonad
+
+      Playground.P1
 
       Signatures
 
