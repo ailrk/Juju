@@ -85,4 +85,3 @@ liftReaderT = ReaderT . const
 liftCallCC :: CallCC m a b -> CallCC (ReaderT r m) a b
 liftCallCC callcc f = ReaderT $ \r ->
   callcc $ \c -> runReaderT (f (ReaderT . const . c)) r
-

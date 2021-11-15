@@ -25,3 +25,4 @@ Bullet points:
 - Select monad for bracktracking algorithms
 - Backward state monad and time traveling.
 - Just go with `RWST r w s IO` and solve all headaches.
+- Probability monad

@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               haskell-effs
+name:               haskell-concurrency
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -23,33 +23,10 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:
-      Transformers.Class
-      Transformers.Identity
-      Transformers.Except
-      Transformers.Cont
-      Transformers.RWS
-      Transformers.Reader
-      Transformers.Writer
-      Transformers.State
-      Transformers.Maybe
-      Transformers.Select
-      Transformers.RState
-      Transformers.Coroutine
+      Async
+      Chan
 
-      Mtl.Identity
-      Mtl.Except
-      Mtl.Cont
-      Mtl.RWS
-      Mtl.Reader
-      Mtl.Writer
-      Mtl.State
-
-      Control.Control
-      Control.IndexedMonad
-
-      Playground.P1
-
-      Signatures
+      Test
 
     -- Modules included in this library but not exported.
     -- other-modules:
