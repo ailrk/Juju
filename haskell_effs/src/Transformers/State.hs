@@ -15,7 +15,6 @@ import           Transformers.Class
 
 -- lazy state
 
-
 type StateT :: Type -> (Type -> Type) -> Type -> Type
 newtype StateT s m a = StateT { runStateT :: s -> m (a, s) }
 

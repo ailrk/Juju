@@ -1,8 +1,14 @@
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFunctor #-}
 
 module FixPoint where
 
 import           Control.Arrow
+
+-- - we can factor out the recursion part out from a recursive function and
+--   rewrite it with fix point.
+-- - same idea applies to type. We can factor out a inductive type to make it
+--   flat.
 
 data Lit
   = StrLit String
@@ -11,8 +17,7 @@ data Lit
   deriving (Show, Eq)
 
 
--- one way to define Unary might be `Unary String Expr`. We abstract away the
--- Expr part and turns it into a universal type.
+-- Expr has no recursive part.
 data Expr a
   = Index a a
   | Call a [a]
@@ -22,6 +27,7 @@ data Expr a
   | Literal Lit
   deriving (Show, Eq, Functor)
 
+-- Type level recursion
 data Fix f = In (f (Fix f))
 
 -- out is a helper function to evaluate the Term f
@@ -29,11 +35,11 @@ out :: Fix f -> f (Fix f)
 out (In t) = t
 
 
-n = let term = In (Binary (In (Paren (In (Literal (IntLit 3)))))
-                           "+"
-                           (In (Binary (In (Binary (In (Literal (IntLit 3)))
-                                           "*"
-                                           (In (Literal (IntLit 10)))))
-                                        "-"
-                                        (In (Literal (IntLit 10))))))
-      in out term
+-- fold over expr
+foldF :: Functor f => (f a -> a) -> Fix f -> a
+foldF f (In expr) = f (fmap (foldF f) expr)
+
+-- fold over an expr
+test1 :: Monoid a => a
+test1 = foldF (const mempty) (In (Paren undefined))
+

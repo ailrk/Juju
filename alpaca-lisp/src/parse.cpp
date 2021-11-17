@@ -1,5 +1,2 @@
 #include "parse.h"
-
-void work() {
-
-}
+void work() {}
