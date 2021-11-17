@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               haskell-algebraic-eff
+name:               haskell-algebra
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -22,7 +22,12 @@ maintainer:         jimmy123good@hotmail.com
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  MyLib
+    exposed-modules:
+      RecursionScheme
+      DataTypeALaCarte
+      FreeMonad
+      FreerMonad
+      FAlgebra
 
     -- Modules included in this library but not exported.
     -- other-modules:

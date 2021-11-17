@@ -14,7 +14,7 @@ import           Data.Traversable
 
 import           Data.IORef
 
-
+----------------------------------------
 -- use binary function as infixed operator to make the data acted on obvious
 infixBinop :: IO ()
 infixBinop = do
@@ -22,6 +22,7 @@ infixBinop = do
   ref `writeIORef` 10
 
 
+----------------------------------------
 -- sequence a list of actions
 fun2 :: IO ()
 fun2 = do
@@ -29,11 +30,13 @@ fun2 = do
   sequenceA_ xs
 
 
+----------------------------------------
 -- composing endo functors
 foldFns :: Double -> Double
 foldFns = foldr1 (.) [(* 10), (+ 1), (/ 100)]
 
 
+----------------------------------------
 -- fold klesli arrows
 foldKlesli = foldr1 (<=<) [compute (+), compute subtract]
   where
@@ -43,6 +46,7 @@ foldKlesli = foldr1 (<=<) [compute (+), compute subtract]
       return $ op v n
 
 
+----------------------------------------
 -- lifting a function. For a function works on (m :: Type -> Type), we want to
 -- lift it to get another function works on (t m).
 --
@@ -58,23 +62,26 @@ liftSomething op f x = f x >>= \ ma -> return $ op (const ma) x
 
 
 
+----------------------------------------
 -- apply function to nested functor. just compose fmap and penetraing.
 fmapfmap :: (Functor f, Monad m) => (a -> b) -> m (f a) -> m (f b)
 fmapfmap f m = (fmap . fmap) f m
 
 
+----------------------------------------
 -- mapping a kelsli arrow into a functor.
 -- (f =<<) is the monadic equivalence to (f $)
 mapKlesli :: (Functor f, Monad m) => (a -> m b) -> f (m a) -> f (m b)
 mapKlesli f m = fmap (f =<<) m
 
 
+----------------------------------------
 -- easily stack monad transformers
 -- you can easily stuck monad transformers by applying the runner and
 -- transformer runners api design are unfortunate, if you want to write in this
 -- style you need to flip the runner.
 --
--- The ratoinale might be a function takes `self` as the first parameter, but
+-- The rationale might be a function takes `self` as the first parameter, but
 -- really you want to make the biggest part the last so you can have long
 -- definition.
 

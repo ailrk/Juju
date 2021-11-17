@@ -1,4 +1,4 @@
-# Revision history for haskell-algebraic-eff
+# Revision history for haskell-algebra
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

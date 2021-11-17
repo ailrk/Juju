@@ -2,7 +2,14 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE DeriveFunctor #-}
 
-module Free.FAlgebra where
+module FAlgebra where
+
+----------------------------------------
+-- Notion of algebra:
+-- 1. creating expression
+-- 2. extract value from the expression
+--
+-- In haskell we simply define it as (f a -> a)
 
 ----------------------------------------
 -- algebra and it's dual coalgebra
@@ -15,7 +22,10 @@ type    CoAlgebra :: (Type -> Type) -> Type -> Type
 newtype CoAlgebra f a = CoAlgebra { runCoAlgebra :: a -> f a }
 
 
+----------------------------------------
+-- initial object and final object in category of F-Algebra
 -- initial algebra, final algebra
+--
 -- Initial algebra is just Fix.
 type    Initial :: (Type -> Type) -> Type
 newtype Initial f = In (f (Initial f))

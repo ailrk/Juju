@@ -48,11 +48,6 @@ library
       Control.Control
       Control.IndexedMonad
 
-      Free.FreerMonad
-      Free.FreeMonad
-      Free.DataTypeALaCarte
-      Free.RecursionScheme
-
       Test.P1
 
       Signatures
