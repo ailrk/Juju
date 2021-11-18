@@ -182,5 +182,4 @@ instance (Dump f, Dump g) => Dump (f :+: g) where
 match :: g :<: f => Expr f -> Maybe (g (Expr f))
 match (In t) = prj t
 
-----------------------------------------
---
+
