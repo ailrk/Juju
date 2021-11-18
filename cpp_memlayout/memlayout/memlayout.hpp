@@ -120,6 +120,7 @@ class SomeHasLayout {
 /*     } */
 };
 
+
 template <typename T> std::optional<HasLayout<T>> make_has_layout(T &&value) {
     return HasLayout<T>::create(std::forward<T &&>(value));
 }
