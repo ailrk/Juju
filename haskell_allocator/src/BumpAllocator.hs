@@ -22,7 +22,6 @@ data BumpAllocator = BumpAllocator
   , allocations :: {-# UNPACK #-} !Word
   }
 
-
 new :: BumpAllocator
 new = BumpAllocator 0 0 0 0
 {-# INLINE new #-}

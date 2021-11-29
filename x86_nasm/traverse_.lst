@@ -1,0 +1,71 @@
+     1                                  global _start
+     2                                  global main
+     3                                  
+     4                                  section .data
+     5 00000000 414243444546                string1 db "ABCDEF"
+     6 00000006 00                          ref1 db 0
+     7                                  
+     8                                  section .text
+     9                                  main:
+    10 00000000 68[00000000]                push string1
+    11 00000005 6A07                        push 7
+    12 00000007 68[45000000]                push putchar
+    13 0000000C E802000000                  call traverse_
+    14 00000011 EB5B                        jmp exit
+    15                                  
+    16                                  ; &arr -> size(arr) -> op -> a
+    17                                  traverse_:
+    18 00000013 55                          push ebp
+    19 00000014 89E5                        mov ebp, esp
+    20 00000016 8B4508                      mov eax, [ebp+8]            ; op
+    21 00000019 8B5D0C                      mov ebx, [ebp+12]           ; size
+    22 0000001C 8B4D10                      mov ecx, [ebp+16]           ; arr
+    23                                  
+    24 0000001F 85DB                        test ebx, ebx
+    25 00000021 7417                        jz traverse_end
+    26                                  
+    27 00000023 BE00000000                  mov esi, 0
+    28                                      loop1:
+    29 00000028 8B1431                      mov edx, [ecx + esi]        ; get ith element
+    30                                  
+    31 0000002B 52                          push edx
+    32 0000002C FFD0                        call eax
+    33 0000002E 890431                      mov [ecx + esi], eax        ; update element
+    34                                  
+    35 00000031 83C601                      add esi, 1
+    36 00000034 39DE                        cmp esi, ebx
+    37 00000036 7D02                        jge traverse_end
+    38 00000038 EBEE                        jmp loop1
+    39                                  
+    40                                      traverse_end:
+    41 0000003A 6A78                        push 'x'
+    42 0000003C E804000000                  call putchar
+    43                                  
+    44 00000041 89EC                        mov esp, ebp
+    45 00000043 5D                          pop ebp
+    46 00000044 C3                          ret
+    47                                  
+    48                                  ; ; a proper functional call pushes parameters into stack.
+    49                                  ; ; params | ret | ebp | ...
+    50                                  ; a -> a
+    51                                  putchar:
+    52 00000045 55                          push ebp
+    53 00000046 89E5                        mov ebp, esp
+    54 00000048 8B7D08                      mov edi, [ebp+8]
+    55 0000004B 893D[06000000]              mov [ref1], edi
+    56                                  
+    57 00000051 B804000000                  mov eax, 4
+    58 00000056 BB01000000                  mov ebx, 1
+    59 0000005B B9[06000000]                mov ecx, ref1
+    60 00000060 BA01000000                  mov edx, 1
+    61 00000065 CD80                        int 0x80
+    62                                  
+    63 00000067 8B4508                      mov eax, [ebp+8]            ; return the same value
+    64                                  
+    65 0000006A 89EC                        mov esp, ebp
+    66 0000006C 5D                          pop ebp
+    67 0000006D C3                          ret
+    68                                  
+    69                                  exit:
+    70 0000006E B801000000                  mov eax, 1
+    71 00000073 CD80                        int 0x80

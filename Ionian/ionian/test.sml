@@ -1,3 +1,0 @@
-structure Test =
-struct
-end

@@ -9,6 +9,8 @@
 module DataTypeALaCarte where
 
 
+----------------------------------------
+
 -- http://www.cs.ru.nl/~W.Swierstra/Publications/DataTypesALaCarte.pdf
 -- http://www.cs.nott.ac.uk/~pszgmh/alacarte.pdf
 
@@ -94,14 +96,10 @@ eval expr = foldExpr evalAlgebra expr
 ----------------------------------------
 -- automating injection
 
--- ps: multi parameter typeclass represents relation.
-
--- sub :=<: sup iff exists some injection form sub a to sup a.
 class (Functor sub, Functor sup) => sub :<: sup where
   inj :: sub a -> sup a
   prj :: sup a -> Maybe (sub a)     -- a partial inverse
 
--- :=<: is partial order.
 instance Functor f => f :<: f where
   inj = id
   prj = Just . id
@@ -113,9 +111,6 @@ instance
     Inl n -> Just n
     _     -> Nothing
 
--- f :<: g, we only search on the right hand side.
--- :+: is defined right assoicated so we don't need to worry about the left
--- hand side case.
 instance {-# OVERLAPPING #-}
   (Functor f, Functor g, Functor h, f :<: g) => f :<: (h :+: g) where
   inj = Inr . inj
@@ -181,5 +176,3 @@ instance (Dump f, Dump g) => Dump (f :+: g) where
 
 match :: g :<: f => Expr f -> Maybe (g (Expr f))
 match (In t) = prj t
-
-

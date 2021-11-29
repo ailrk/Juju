@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+FILENAME=$(echo $1 | sed -r "s/(.*).s/\1/")
+OBJ="$FILENAME.o"
+echo "output filename: $FILENAME"
+echo "object code: $OBJ"
+echo "====================start======================"
+echo " "
+nasm -f elf $1
+ld -m elf_i386 -s -o $FILENAME $OBJ
+
+./$FILENAME
+
+rm $FILENAME.o
+rm $FILENAME

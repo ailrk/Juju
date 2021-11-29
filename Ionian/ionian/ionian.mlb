@@ -1,7 +1,0 @@
-$(SML_LIB)/basis/basis.mlb
-absyn.sml
-error.sml
-parse.sml
-test.sml
-token.sml
-token.sig
