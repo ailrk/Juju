@@ -85,4 +85,3 @@ int main(void) {
     auto ret = test2(1, 2);
     return 0;
 }
-

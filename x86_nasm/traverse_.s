@@ -46,8 +46,8 @@ traverse_:
     pop ebp
     ret
 
-; ; a proper functional call pushes parameters into stack.
-; ; params | ret | ebp | ...
+; a proper functional call pushes parameters into stack.
+; params | ret | ebp | ...
 ; a -> a
 putchar:
     push ebp
