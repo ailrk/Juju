@@ -1,59 +1,83 @@
-# Programming x86 assembly without an OS.
+# Boot sequence for x86
+
+Story about cpu before an OS is loaded.
 
 
-## Addressing space
-The length of ip register determines how many memory a CPU can potentially address. In the case of 16 bit, we can potentially address up to 2^16 addresses. These addressing space is completey abstracted away from CPU's internal mechanism, and what is certain address addressing completely depends on what device is plugged in that range.
+## CPU IO model
+CPU itself doesn't do anything, it needs to connect with the outside world to have input and output.
 
-All cpu will have n pins expose to the out side world that let it to address. This pins are very flexible, we can connect them with ther device in any way we want.
-
-Here are two examples. In CPU 1, we connected two devices to a 8 bit cpu. dev 1 can be addressed from 0x0 to 0x7, and dev 2 can be addressed from  0x64 to 0x255.
-```
-          CPU 1
-0   . . . . . . . .
-    | | |     | | |
-    . . .     . . .
-     dev1      dev2
-```
-
-In CPU 2, we hooked up the CPU with a RAM, but only use part of it's storage. we left the last pin open, so we can address 2^7 bytes from 0x0 to 0x127.
+Traditional CPU like 6502 connect to the outside world with `memory mapped IO`. Meaning memory and devices share the same address space. In another word, memory is just another external device for the CPU. Because the mapping mechanism simply map some address to some devices, the CPU has no idea what it's connected on boot. This is a very flexible method, because we can address devices as if we're addressing the memory. One problem with this approach is that we have no idea what's at the other side of the pin, so things need to be hard coded for a specific setup. Also we have to allocate a chunk of addressing space for devices, so the amount of address for memory will be smaller (Tho with 64 bit addressing space it's not a problem anymore).
 
 ```
-        CPU 2
-0   . . . . . . . .
-    | | | | | | |
-  . . . . . . . .
-        RAM
+    How does address space looks like for 36 bit x86
+
+       +----------------+ 0xffffffff
+[1] +--+ BIOS Flash     |
+    |  +----------------+
+    |  |  APIC          | for some inptterupt handler
+    |  +----------------+
+    +--+  PCI Mem RANGE |
+       +----------------+
+       |internal graphic|
+       +----------------+
+       |  TSEG          |
+       +----------------+
+       |  DPR           |
+       +----------------+
+       |  main memory   |
+       |                |
+       +----------------+ 0x01000000  so main memory is only part of the space
+       | ISA HOLE       |
+       +----------------+ 0x00f00000
+       | main memory    |
+       +----------------+ 0x00100000
+       | DOS capability |
+       +----------------+ 0x00000000
+
+: [1] are memory mapped IO.
+      BIOS is addressable from flash (A rom)
+      APIC is the advanced programmable interrupt controller.
+      PCI mem range is programmed by BIOS
+
 ```
 
-This is the case for all cpu base on IP and has exposed pins for addressing. In most x86 chips, we usually have BIOS stored in a ROM, addressable from a fixed address.
+Also there is `port mapped IO`, where IO devices have separated address space from memory space. X86 supports port mapped IO, it has instruction `in` and `out` that allows you to read or write bytes between eax and devices on given IO port.
+
+```
+    port IO address for X86
+
+       +----------------+
+       | Port 65535     |
+       +----------------+ 0xffff
+       |                |
+       | ...            |
+       |                |
+       +----------------+ 0x003
+       | Port 2         |
+       +----------------+ 0x002
+       | Port 1         |
+       +----------------+ 0x001
+       | Port 0         |
+       +----------------+ 0x000
+```
+
+Port IO is an extra layer of indirection, thus more complex to implement. Before explainning what's going on, we list some components getting involved in x86: `Processor`, `MCH (memory control hub)`, `ICH (io control hub)`, `DMI (direct memory interface)`.
+
+Each processor connects to a MCH for processing the addressing signal. Access to IO space will be forwarded by the MCH to DMI, and DMI further forward it to ICH. ICH
 
 
-## BIOS
+```
+     Processor -> HCH -> ICH -> (IO space)
+```
 
-## boot sequence
 
-## real mode
-X86 has different modes, it behaves differently under different modes. Once the computer is on, it's in real mode. Real mode is a simple 16 bit mode with segmented memory model. It's the first x86 mode, and for backward capability it's still used today.
+In X86 with PCI support, devices are connected on PCI bus, and it's possible for the CPU to query what's connected to the Bus and what can it do with them. Instead of making assumption, CPU can discover devices.
 
-In real mode, we only have access to 16 bit registers. To address 32 bit memory, we need segment the memory in to segmentations. Reigster like ds, ss, cs, es stores the starting address of each segmentation, and we address the content by adding offset on top of the segment.
+## Mode and BIOS
+X86 are backward compatible, all x86 cpus will first boot into a 16 bit real mode, then you need to mannually enable the protected mode to use the full power.
 
-## protected mode
 
-## GDT (Global descriptor table)
+## Boot process
 
-## IDT (Interupt descriptor table)
 
-## Boot loader
-
-## How does interrupts work
-
-## MMU
-
-## What about multi processing?
-
-## Crafting a C stack.
-
-## References
-
-- https://wiki.osdev.org/Global_Descriptor_Table
-- https://wiki.osdev.org/BIOS
+## Setup a C stack.
