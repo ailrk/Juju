@@ -434,6 +434,6 @@ setup.ml
 elm-stuff
 # elm-repl generated files
 repl-temp-*
-elm_*/index.html
+# elm_*/index.html
 
 # End of https://www.toptal.com/developers/gitignore/api/elm

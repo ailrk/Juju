@@ -7,10 +7,11 @@ import View exposing (..)
 
 
 main : Program () Model Msg
-main =
-    Browser.element
+main = Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }

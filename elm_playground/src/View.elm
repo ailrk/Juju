@@ -1,64 +1,53 @@
 module View exposing (..)
 
-import Html exposing (Html, button, div, h2, input, text)
+import Browser exposing (Document)
+import Debug exposing (toString)
+import Html exposing (Html, button, div, h4, input, li, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import LeafletMap
 import Types exposing (..)
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    div
-        []
-        [ div []
-            [ Html.text "Hello" ]
-        , div []
-            -- [ style "width" "80%"
-            -- , style "height" "80%"
-            -- ]
-            [ input [ placeholder "Lat:", value (String.fromFloat model.lng) ] []
-            , input [ placeholder "Lng:", value (String.fromFloat model.lat) ] []
-            , button [ onClick Dec ] [ text "Find Route" ]
-            , canvasMap
-            ]
-        ]
+    { title = "Path finder"
+    , body = [ body model ]
+    }
 
 
-canvasMap : Html Msg
-canvasMap =
-    LeafletMap.view
-        [ LeafletMap.mapId "canvasMapId"
-        , LeafletMap.className "canvasMap"
-        , LeafletMap.defaultPopup "map"
-        , LeafletMap.iconHeight 64
-        , LeafletMap.iconWidth 64
-        , LeafletMap.iconUrl "https://image.flaticon.com/icons/svg/194/194648.svg"
-        , LeafletMap.latitude 49.282
-        , LeafletMap.longitude 123.12
-        , LeafletMap.scale 13
-        , LeafletMap.showDefaultMarker True
-        , LeafletMap.showScale True
-        , LeafletMap.tileLayer "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        ]
-        [ ( "marker"
-          , LeafletMap.marker
-                [ LeafletMap.iconUrl "https://image.flaticon.com/icons/svg/194/194648.svg"
-                , LeafletMap.iconHeight 64
-                , LeafletMap.iconWidth 64
-                , LeafletMap.latitude 49.282
-                , LeafletMap.longitude 123.12
+body : Model -> Html Msg
+body model =
+    div []
+        [ div [ class "col-md-4" ]
+            [ div [ class "panel panel-info" ]
+                [ div [ class "panel-heading" ] [ text "Path finding" ]
+                , div
+                    [ class "panel-body"
+                    , style "width" "80%"
+                    , style "height" "80%"
+                    ]
+                    [ h4 [] [ text "Bounds" ] -- TODO map here
+                    ]
                 ]
-                []
-          )
+            ]
+        , div [ class "col-md-4" ]
+            [ h4 [] [ text "Body" ] ]
         ]
 
 
+addMarkers : List Marker -> Html Msg
+addMarkers =
+    ul [ style "margin-top" "10px" ] << List.map addMarker
 
--- div []
---     [ button [ onClick Dec ] [ text "-" ]
---     , div [] [ text (String.fromInt model.num) ]
---     , button [ onClick Inc ] [ text "+" ]
---     , input [ placeholder "Text to reverse ", value model.msg, onInput Chg ] []
---     , div [] [ text (String.reverse model.msg) ]
---     ]
+
+addMarker : Marker -> Html Msg
+addMarker mk =
+    li [ style "martin-botom" "20px" ]
+        [ button
+            [ class "btn btn-warning"
+            , style "display" "inline-block"
+            , onClick (RemoveMarker mk.id)
+            ]
+            [ text "Remove" ]
+        , span [] [ text ("Marker: " ++ toString mk.lat ++ ", " ++ toString mk.lng) ]
+        ]
