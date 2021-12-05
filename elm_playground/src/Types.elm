@@ -9,6 +9,7 @@ type alias Model =
     , msg : String
     , sinks : List Marker -- sinks of the path find algorithm
     , sources : List Marker -- sources of the path find algorithm.
+    , bounds : List Float
     }
 
 

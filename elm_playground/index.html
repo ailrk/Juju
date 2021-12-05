@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Find</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+          crossorigin="anonymous">
+
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" /> -->
+    <!-- <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script> -->
+    <!-- <script src="https://unpkg.com/esri-leaflet@2.0.4"></script> -->
+
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <script src="https://unpkg.com/esri-leaflet@3.0.0/dist/esri-leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet-vector@3.0.0/dist/esri-leaflet-vector.js"></script>
+
+    <style>
+        #mapid {
+            height: 400px;
+            border: 1px solid #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="container-fluid"> -->
+    <!--     <div class="col-md-4"> -->
+    <!--         <div class="panel panel-success"> -->
+    <!--             <div class="panel-heading"> -->
+    <!--                 Map -->
+    <!--             </div> -->
+    <!--             <div class="panel-body"> -->
+    <!--                 <div id="mapid"></div> -->
+    <!--             </div> -->
+    <!--         </div> -->
+    <!--     </div> -->
+    <!--     <div id="app"/> -->
+    <!-- </div> -->
+
+
+    <div class="container-fluid">
+        <h2>Elm Leaflet</h2>
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Map (JavaScript)
+                </div>
+                <div class="panel-body">
+                    <div id="mapid"></div>
+                </div>
+            </div>
+        </div>
+        <div id="elmApp"/>
+    </div>
+
+
+    <script src="dist/bundle.js"></script>
+    <script>
+
+        var themap = L.map('mapid', {zoomControl:false}).setView([44.56, -123.26], 13);
+        L.esri.basemapLayer("Topographic").addTo(themap);
+        console.log(themap);
+
+        var app = Elm.Main.init(document.getElementById("elmApp"));
+        app.ports.setBounds.send(themap.getBounds().toBBoxString());
+
+        themap.on('moveend', function() {
+            var bounds = themap.getBounds().toBBoxString();
+            app.ports.setBounds.send(bounds);
+        })
+
+        app.ports.zoomMap.subscribe(function(zoom) {
+            themap.zoomIn(zoom)
+        });
+
+        var markers = {};
+        themap.on('click', function(e) {
+            var newMarker = new L.marker(e.latlng).addTo(themap);
+            var latLng = newMarker.getLatLng();
+
+            app.ports.addMarker.send({
+                lat: latLng.lat,
+                lng: latLng.lng,
+                id: newMarker._leaflet_id
+            });
+            markers[newMarker._leaflet_id] = newMarker;
+        })
+
+        app.ports.removeMarker.subscribe(function(markerid) {
+            themap.removeLayer(markers[markerid]);
+            delete markers[markerid];
+        })
+
+    </script>
+</body>
+
+</html>

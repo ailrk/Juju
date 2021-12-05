@@ -4,6 +4,7 @@ import Browser
 import State exposing (..)
 import Types exposing (..)
 import View exposing (..)
+import Subs exposing (..)
 
 
 main : Program () Model Msg

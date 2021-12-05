@@ -2,9 +2,10 @@ module View exposing (..)
 
 import Browser exposing (Document)
 import Debug exposing (toString)
-import Html exposing (Html, button, div, h4, input, li, span, text, ul)
+import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Regex exposing (..)
 import Types exposing (..)
 
 
@@ -20,19 +21,32 @@ body model =
     div []
         [ div [ class "col-md-4" ]
             [ div [ class "panel panel-info" ]
-                [ div [ class "panel-heading" ] [ text "Path finding" ]
-                , div
-                    [ class "panel-body"
-                    , style "width" "80%"
-                    , style "height" "80%"
-                    ]
-                    [ h4 [] [ text "Bounds" ] -- TODO map here
+                [ div [ class "panel-heading" ] [ text "Contoller" ]
+                , div [ class "panel-body" ]
+                    [ h4 [] [ text "Bounds" ]
+                    , div [] (List.map addBound model.bounds)
+                    , button [ onClick (ZoomMap 1), class "btn btn-primary" ] [ text "Zoom In" ]
+                    , div [ style "margin" "10px" ] []
+                    , button [ onClick (ZoomMap -1), class "btn btn-primary" ] [ text "Zoom Out" ]
+                    , addMarkers model.sinks
                     ]
                 ]
             ]
         , div [ class "col-md-4" ]
-            [ h4 [] [ text "Body" ] ]
+            [ div [ class "panel panel-info" ]
+                [ div [ class "panel-heading" ] [ text "State" ]
+                , div [ class "panel-body" ]
+                    [ pre [] [ text (toString model) ]
+                    , div [ id "mapid" ] []
+                    ]
+                ]
+            ]
         ]
+
+
+addBound : Float -> Html Msg
+addBound bound =
+    div [] [ text (toString bound) ]
 
 
 addMarkers : List Marker -> Html Msg
