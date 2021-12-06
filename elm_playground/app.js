@@ -85,7 +85,7 @@ app.ports.pushMarker_.subscribe(function(tup) {
   const [mtype, x, y] = tup;
   let oldMode = currentMode;
   currentMode = mtype;
-  app.ports.toggleModeJs.send(null);
+  if (oldMode !== currentMode) app.ports.toggleModeJs.send(null);
   {
     pushNewMarker(L.latLng(x, y));
   }
@@ -106,19 +106,31 @@ app.ports.removeMarker.subscribe(function(markerid) {
   delete markers[markerid];
 });
 
+
+// add path
 app.ports.findPath.subscribe(function(mks) {
   let [mk1, mk2] = mks;
-  shortestPath(mk1, mk2, function(e) {
+  route(mk1, mk2, function(e, routing) {
     app.ports.addPath.send({
       from: mk1,
       to: mk2,
       time: e.routes[0].summary.totalTime,
       distance: e.routes[0].summary.totalDistance,
     });
+
+    paths[mk1.id + mk2.id] = routing;
+    console.log(paths);
+
   });
-
-
 });
+
+
+// // TODO
+// app.ports.findPathAll.subscribe(function() {
+
+// });
+
+
 
 app.ports.clearAll.subscribe(function() {
   reset();
@@ -157,8 +169,8 @@ function pushNewMarker(latlng) {
 }
 
 // find the shortest path from marker1 to marker2.
-function shortestPath(marker1, marker2, cb) {
-  let control = L.Routing.control({
+function route(marker1, marker2, cb) {
+  let routing = L.Routing.control({
     waypoints: [
       L.latLng(marker1.lat, marker1.lng),
       L.latLng(marker2.lat, marker2.lng),
@@ -168,12 +180,13 @@ function shortestPath(marker1, marker2, cb) {
     createMarker: function(p1, p2) { }
   });
 
-  control.on('routesfound', function(e) {
-    cb(e);
+  routing.addTo(themap);
+  routing.on('routesfound', function(e) {
+    cb(e, routing);
     console.log(JSON.stringify(e.routes[0].summary));
   });
-
-  control.addTo(themap);
 }
+
+
 
 init();

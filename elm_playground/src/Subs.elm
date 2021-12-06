@@ -59,10 +59,14 @@ port removeMarker : Int -> Cmd msg
 
 
 
+-- port removePath : Int -> Cmd msg
 -- add path to model.
 
 
 port addPath : (Path -> msg) -> Sub msg
+
+
+port addPathSave : (Path -> msg) -> Sub msg
 
 
 
@@ -70,6 +74,13 @@ port addPath : (Path -> msg) -> Sub msg
 
 
 port findPath : ( RawMarker, RawMarker ) -> Cmd msg
+
+
+
+-- compute shortest path for all sinks to their closest source.
+
+
+-- port findPathAll : () -> Cmd msg
 
 
 port clearAll : () -> Cmd msg

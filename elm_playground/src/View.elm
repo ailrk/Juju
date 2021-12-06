@@ -25,8 +25,8 @@ body model =
                 [ div [ class "panel panel-info" ]
                     [ div [ class "panel-heading" ] [ text "Contoller" ]
                     , div [ class "panel-body" ]
-                        [ h4 [] [ text "Find Path" ]
-                        , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Find Path" ]
+                        [ h4 [] [ text "Shortest Path" ]
+                        , button [ onClick FindPathAll, class "btn btn-light", style "margin-right" "5px" ] [ text "Shortest Path" ]
                         , br [] []
                         , br [] []
 

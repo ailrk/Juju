@@ -1,6 +1,7 @@
 module State exposing (..)
 
 import Browser.Navigation as Nav
+import Compare exposing (..)
 import Html.Attributes exposing (..)
 import Random
 import String exposing (split)
@@ -97,16 +98,20 @@ update msg model =
                 ( Marker Source rm1, Marker Sink rm2 ) ->
                     ( model, findPath ( rm1, rm2 ) )
 
+                ( Marker Sink rm1, Marker Source rm2 ) ->
+                    ( model, findPath ( rm1, rm2 ) )
+
                 _ ->
                     ( model, Cmd.none )
 
         AddPath path ->
             ( { model | paths = path :: model.paths }, Cmd.none )
 
-        -- find the shortest path for all sinks and sources.
-        -- only cloestest sinks and sources will be paired up.
+        -- before: path is empty
+        -- after: 1. each sink found a cloesest warehouse.
+        --        2. their path in paths
         FindPathAll ->
-            ( model, Cmd.none )
+            ( model, scanAll model.sinks model.sources )
 
         Clear ->
             ( initModel, clearAll () )
@@ -117,6 +122,49 @@ update msg model =
 
         LinkClicked _ ->
             ( model, Cmd.none )
+
+
+
+--  take a sink, and a list  of source, zip with each one,
+--  for each pair [ (s, S1), (s, S2) ..], run findPath to get path in paths
+--
+-- scan all source and
+-- for all [x x x x x]
+
+
+scanAll : List Marker -> List Marker -> Cmd Msg
+scanAll xs ys =
+    let
+        f ms1 ms2 =
+            case ms1 of
+                m :: ms ->
+                    scan1 m ms2 :: f ms ms2
+
+                [] ->
+                    []
+    in
+    Cmd.batch (f xs ys)
+
+
+scan1 : Marker -> List Marker -> Cmd Msg
+scan1 marker ls =
+    let
+        (Marker _ rm1) =
+            marker
+
+        zipped =
+            List.map (\(Marker _ rm2) -> ( rm1, rm2 )) ls
+    in
+    Cmd.batch (List.map findPath zipped)
+
+
+
+-- [ p1, p2, ... ]
+
+
+minPath : List Path -> Maybe Path
+minPath =
+    List.head << List.sortBy .time
 
 
 

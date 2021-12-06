@@ -8,8 +8,8 @@ type alias Model =
     { markerMode : MarkerType
     , sinks : List Marker -- sinks of the path find algorithm
     , sources : List Marker -- sources of the path find algorithm.
-    , paths : List Path
     , bounds : List Float
+    , paths : List Path
     }
 
 
@@ -57,6 +57,11 @@ type alias Path =
     }
 
 
+pathid : Path -> Int
+pathid { from, to } =
+    from.id + to.id
+
+
 type Msg
     = -- map control
       SetBounds String
@@ -66,7 +71,7 @@ type Msg
     | ToggleMarkerType
     | Roll
     | GenerateRandomMarkers ( MarkerType, Float, Float )
-    | FindPath (Marker, Marker)
+    | FindPath ( Marker, Marker )
     | AddPath Path
     | FindPathAll
     | Clear
