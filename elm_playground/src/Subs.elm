@@ -5,7 +5,11 @@ import Types exposing (..)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ setBounds SetBounds, addMarker (\rawMarker -> Marker model.markerMode rawMarker |> AddMarker) ]
+    Sub.batch
+        [ setBounds SetBounds
+        , addMarker (\rawMarker -> Marker model.markerMode rawMarker |> AddMarker)
+        , toggleModeJs (\_ -> ToggleMarkerType)
+        ]
 
 
 port setBounds : (String -> msg) -> Sub msg
@@ -62,3 +66,10 @@ toggleMode t =
 
         Source ->
             toggleMode_ "source"
+
+
+
+-- toggle from js
+
+
+port toggleModeJs : (() -> msg) -> Sub msg

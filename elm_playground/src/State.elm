@@ -29,7 +29,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetBounds bounds ->
-            ( { model | bounds = List.map (Maybe.withDefault 0 << String.toFloat) (split "," bounds) }, Cmd.none )
+            ( { model
+                | bounds =
+                    List.map (Maybe.withDefault 0 << String.toFloat)
+                        (split "," bounds)
+              }
+            , Cmd.none
+            )
 
         ZoomMap int ->
             ( model, zoomMap int )
@@ -53,14 +59,32 @@ update msg model =
         RemoveMarker int ->
             case model.markerMode of
                 Sink ->
-                    ( { model | sinks = List.filter (\(Marker _ i) -> i.id /= int) model.sinks }, removeMarker int )
+                    ( { model
+                        | sinks =
+                            List.filter (\(Marker _ i) -> i.id /= int)
+                                model.sinks
+                      }
+                    , removeMarker int
+                    )
 
                 Source ->
-                    ( { model | sources = List.filter (\(Marker _ i) -> i.id /= int) model.sources }, removeMarker int )
+                    ( { model
+                        | sources =
+                            List.filter (\(Marker _ i) -> i.id /= int)
+                                model.sources
+                      }
+                    , removeMarker int
+                    )
 
         -- roll a  random (MarkerType, Float, Float).
         Roll ->
-            ( model, Random.generate GenerateRandomMarkers (randomMarker ( 49.26770933925339, -123.17818043177067 ) ( 49.19741959452222, -122.90737245428662 )) )
+            ( model
+            , Random.generate
+                GenerateRandomMarkers
+                (randomMarker ( 49.18770933925339, -123.17818043177067 )
+                    ( 49.11741959452222, -122.90737245428662 )
+                )
+            )
 
         -- pushMaker will trigger a AddMarker at the other side.
         GenerateRandomMarkers tup ->
@@ -91,4 +115,9 @@ randomLatlng ( x1, y1 ) ( x2, y2 ) =
 
 randomMarker : ( Float, Float ) -> ( Float, Float ) -> Random.Generator ( MarkerType, Float, Float )
 randomMarker p1 p2 =
-    randomMarkerType |> Random.andThen (\t -> randomLatlng p1 p2 |> Random.andThen (\( x, y ) -> Random.constant ( t, x, y )))
+    randomMarkerType
+        |> Random.andThen
+            (\t ->
+                randomLatlng p1 p2
+                    |> Random.andThen (\( x, y ) -> Random.constant ( t, x, y ))
+            )
