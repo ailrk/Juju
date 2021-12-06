@@ -9,10 +9,19 @@ subscriptions model =
         [ setBounds SetBounds
         , addMarker (\rawMarker -> Marker model.markerMode rawMarker |> AddMarker)
         , toggleModeJs (\_ -> ToggleMarkerType)
+        , addPath AddPath
         ]
 
 
+
+-- subscribe the latlng bound change.
+
+
 port setBounds : (String -> msg) -> Sub msg
+
+
+
+-- change zoom level
 
 
 port zoomMap : Int -> Cmd msg
@@ -42,7 +51,22 @@ pushMarker tup =
             pushMarker_ ( "source", x, y )
 
 
+
+-- remove marker by id.
+
+
 port removeMarker : Int -> Cmd msg
+
+
+
+-- add path to model.
+
+
+port addPath : (Path -> msg) -> Sub msg
+
+
+
+-- find path. The result will be returned from js by sending to addPath.
 
 
 port findPath : ( RawMarker, RawMarker ) -> Cmd msg

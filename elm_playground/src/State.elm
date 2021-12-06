@@ -4,7 +4,7 @@ import Browser.Navigation as Nav
 import Html.Attributes exposing (..)
 import Random
 import String exposing (split)
-import Subs exposing (clearAll, pushMarker, removeMarker, toggleMode, zoomMap)
+import Subs exposing (clearAll, findPath, pushMarker, removeMarker, toggleMode, zoomMap)
 import Types exposing (..)
 import Url
 
@@ -15,6 +15,7 @@ initModel =
     , sinks = []
     , sources = []
     , bounds = []
+    , paths = []
     }
 
 
@@ -90,6 +91,18 @@ update msg model =
         GenerateRandomMarkers tup ->
             ( model, pushMarker tup )
 
+        -- find the shortest path between two points.
+        FindPath tup ->
+            case tup of
+                ( Marker Source rm1, Marker Sink rm2 ) ->
+                    ( model, findPath ( rm1, rm2 ) )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        AddPath path ->
+            ( { model | paths = path :: model.paths }, Cmd.none )
+
         Clear ->
             ( initModel, clearAll () )
 
@@ -99,6 +112,10 @@ update msg model =
 
         LinkClicked _ ->
             ( model, Cmd.none )
+
+
+
+-- random marker
 
 
 randomMarkerType : Random.Generator MarkerType

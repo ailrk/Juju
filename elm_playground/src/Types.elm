@@ -8,6 +8,7 @@ type alias Model =
     { markerMode : MarkerType
     , sinks : List Marker -- sinks of the path find algorithm
     , sources : List Marker -- sources of the path find algorithm.
+    , paths : List Path
     , bounds : List Float
     }
 
@@ -43,6 +44,19 @@ type MarkerType
     | Source
 
 
+
+-- path bettween two markerse. Only source and since can form a path.
+-- TODO
+
+
+type alias Path =
+    { from : RawMarker
+    , to : RawMarker
+    , time : Float
+    , distance : Float
+    }
+
+
 type Msg
     = -- map control
       SetBounds String
@@ -52,6 +66,8 @@ type Msg
     | ToggleMarkerType
     | Roll
     | GenerateRandomMarkers ( MarkerType, Float, Float )
+    | FindPath (Marker, Marker)
+    | AddPath Path
     | Clear
       -- navigation
     | LinkClicked Browser.UrlRequest

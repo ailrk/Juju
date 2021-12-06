@@ -1,5 +1,6 @@
 module View exposing (..)
 
+import Array
 import Browser exposing (Document)
 import Debug exposing (toString)
 import Html exposing (..)
@@ -28,6 +29,29 @@ body model =
                         , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Find Path" ]
                         , br [] []
                         , br [] []
+
+                        -- start TODO @Debug
+                        , h4 [] [ text "FindPath " ]
+                        , button
+                            ([ style "margin-right" "5px", class "btn btn-light" ]
+                                ++ (case Array.get 0 (Array.fromList model.sources) of
+                                        Just m1 ->
+                                            case Array.get 0 (Array.fromList model.sinks) of
+                                                Just m2 ->
+                                                    [ onClick (FindPath ( m1, m2 )) ]
+
+                                                Nothing ->
+                                                    []
+
+                                        Nothing ->
+                                            []
+                                   )
+                            )
+                            [ text "FINDPATH" ]
+                        , br [] []
+                        , br [] []
+
+                        -- end
                         , h4 [] [ text "Generate Random Markers:  " ]
                         , button [ style "margin-right" "5px", onClick Roll, class "btn btn-light" ] [ text "Generate" ]
                         , br [] []
@@ -47,10 +71,11 @@ body model =
                 [ div [ class "panel panel-info" ]
                     [ div [ class "panel-heading" ] [ text "Map" ]
                     , div [ class "panel-body" ]
-                        [ -- pre [] [ text (toString model) ]
-                          -- h4 [] [ text "Coordinates" ]
-                          -- , pre [] [ (text << toString) (List.map toString model.bounds) ]
-                          div [ style "margin" "10px" ] []
+                        [ pre [] [ text (toString model) ]
+
+                        -- h4 [] [ text "Coordinates" ]
+                        -- , pre [] [ (text << toString) (List.map toString model.bounds) ]
+                        , div [ style "margin" "10px" ] []
                         , div [ id "mapid" ] []
                         ]
                     ]
