@@ -1,0 +1,8 @@
+- [x] change pin style base on mode: sink / source.
+- [x] show both list of sink and source.
+- [x] Some geo coding support with esri.
+- [] A new warehouse or client automatically add new geojson info.
+- [X] Generate random source and sinks
+- [X] Run shortest path api from app.js
+- [] find the shortest path.
+- [] fix the random generator bug.

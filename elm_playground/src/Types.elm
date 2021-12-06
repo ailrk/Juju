@@ -68,6 +68,7 @@ type Msg
     | GenerateRandomMarkers ( MarkerType, Float, Float )
     | FindPath (Marker, Marker)
     | AddPath Path
+    | FindPathAll
     | Clear
       -- navigation
     | LinkClicked Browser.UrlRequest

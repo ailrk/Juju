@@ -164,19 +164,16 @@ function shortestPath(marker1, marker2, cb) {
       L.latLng(marker2.lat, marker2.lng),
     ],
     routeWhileDragging: true,
-    // show: false,
+    show: false,
     createMarker: function(p1, p2) { }
   });
 
   control.on('routesfound', function(e) {
     cb(e);
-    console.log(e.routes[0].summary);
+    console.log(JSON.stringify(e.routes[0].summary));
   });
 
   control.addTo(themap);
 }
-
-// L.latLng (49.257809,-122.990510) ,
-// L.latLng(49.248709,-122.960510)
 
 init();

@@ -103,6 +103,11 @@ update msg model =
         AddPath path ->
             ( { model | paths = path :: model.paths }, Cmd.none )
 
+        -- find the shortest path for all sinks and sources.
+        -- only cloestest sinks and sources will be paired up.
+        FindPathAll ->
+            ( model, Cmd.none )
+
         Clear ->
             ( initModel, clearAll () )
 
