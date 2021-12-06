@@ -3,18 +3,23 @@ module State exposing (..)
 import Browser.Navigation as Nav
 import Html.Attributes exposing (..)
 import String exposing (split)
-import Subs exposing (removeMarker, toggleMode_, zoomMap)
+import Subs exposing (removeMarker, toggleMode_, zoomMap, clearAll)
 import Types exposing (..)
 import Url
 
 
+initModel : Model
+initModel =
+    { markerMode = Sink
+    , sinks = []
+    , sources = []
+    , bounds = []
+    }
+
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { markerMode = Sink
-      , sinks = []
-      , sources = []
-      , bounds = []
-      }
+    ( initModel
     , Cmd.none
     )
 
@@ -51,6 +56,9 @@ update msg model =
 
                 Source ->
                     ( { model | sources = List.filter (\(Marker _ i) -> i.id /= int) model.sources }, removeMarker int )
+
+        Clear ->
+            ( initModel, clearAll () )
 
         -- navigation
         UrlChanged _ ->

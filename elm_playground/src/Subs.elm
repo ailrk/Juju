@@ -20,6 +20,8 @@ port addMarker : (RawMarker -> msg) -> Sub msg
 port removeMarker : Int -> Cmd msg
 
 
+port clearAll : () -> Cmd msg
+
 -- toggle the current marker type.
 
 

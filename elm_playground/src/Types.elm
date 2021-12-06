@@ -50,6 +50,7 @@ type Msg
     | AddMarker Marker
     | RemoveMarker Int
     | ToggleMarkerType
+    | Clear
       -- navigation
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url

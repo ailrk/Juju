@@ -28,14 +28,12 @@ body model =
                         , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Find Path" ]
                         , br [] []
                         , br [] []
-                        , h4 [] [ text "Marker Type:  ", text (toString model.markerMode) ]
-                        , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Toggle Mode" ]
-                        , br [] []
-                        , br [] []
                         , h4 [] [ text "Map Control:  " ]
                         , button [ style "margin-right" "5px", onClick (ZoomMap 1), class "btn btn-light" ] [ text "Zoom In" ]
                         , button [ onClick (ZoomMap -1), class "btn btn-light" ] [ text "Zoom Out" ]
-                        , addMarkers model
+                        , br [] []
+                        , br [] []
+                        , button [ style "margin-right" "5px", onClick Clear, class "btn btn-light" ] [ text "Clear" ]
                         ]
                     ]
                 ]
@@ -45,16 +43,28 @@ body model =
                 [ div [ class "panel panel-info" ]
                     [ div [ class "panel-heading" ] [ text "State" ]
                     , div [ class "panel-body" ]
-                        [ pre [] [ text (toString model) ]
-                        , h4 [] [ text "Coordinates" ]
+                        [ -- pre [] [ text (toString model) ]
+                          h4 [] [ text "Coordinates" ]
                         , pre [] [ (text << toString) (List.map toString model.bounds) ]
                         , div [ style "margin" "10px" ] []
                         , div [ id "mapid" ] []
                         ]
                     ]
                 ]
+
+        listPanel =
+            div [ class "col-md-2" ]
+                [ div [ class "panel panel-info" ]
+                    [ div [ class "panel-heading" ] [ text "Lists" ]
+                    , div [ class "panel-body" ]
+                        [ h4 [] [ text "Marker Type:  ", text (toString model.markerMode) ]
+                        , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Toggle Mode" ]
+                        , addMarkers model
+                        ]
+                    ]
+                ]
     in
-    div [] [ controlPanel, mapPanel ]
+    div [] [ controlPanel, mapPanel, listPanel ]
 
 
 
@@ -92,13 +102,7 @@ addMarker mk =
                 ]
                 [ text
                     (String.concat
-                        [ case t of
-                            Sink ->
-                                "Sink"
-
-                            Source ->
-                                "Source"
-                        , ": "
+                        [ "Marker: "
                         , toString m.lat
                         , ", "
                         , toString m.lng
