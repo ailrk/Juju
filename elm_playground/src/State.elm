@@ -2,8 +2,9 @@ module State exposing (..)
 
 import Browser.Navigation as Nav
 import Html.Attributes exposing (..)
+import Random
 import String exposing (split)
-import Subs exposing (removeMarker, toggleMode_, zoomMap, clearAll)
+import Subs exposing (clearAll, pushMarker, removeMarker, toggleMode, zoomMap)
 import Types exposing (..)
 import Url
 
@@ -44,10 +45,10 @@ update msg model =
         ToggleMarkerType ->
             case model.markerMode of
                 Sink ->
-                    ( { model | markerMode = Source }, toggleMode_ Source )
+                    ( { model | markerMode = Source }, toggleMode Source )
 
                 Source ->
-                    ( { model | markerMode = Sink }, toggleMode_ Sink )
+                    ( { model | markerMode = Sink }, toggleMode Sink )
 
         RemoveMarker int ->
             case model.markerMode of
@@ -56,6 +57,14 @@ update msg model =
 
                 Source ->
                     ( { model | sources = List.filter (\(Marker _ i) -> i.id /= int) model.sources }, removeMarker int )
+
+        -- roll a  random (MarkerType, Float, Float).
+        Roll ->
+            ( model, Random.generate GenerateRandomMarkers (randomMarker ( 49.26770933925339, -123.17818043177067 ) ( 49.19741959452222, -122.90737245428662 )) )
+
+        -- pushMaker will trigger a AddMarker at the other side.
+        GenerateRandomMarkers tup ->
+            ( model, pushMarker tup )
 
         Clear ->
             ( initModel, clearAll () )
@@ -66,3 +75,20 @@ update msg model =
 
         LinkClicked _ ->
             ( model, Cmd.none )
+
+
+randomMarkerType : Random.Generator MarkerType
+randomMarkerType =
+    Random.uniform Sink [ Source ]
+
+
+randomLatlng : ( Float, Float ) -> ( Float, Float ) -> Random.Generator ( Float, Float )
+randomLatlng ( x1, y1 ) ( x2, y2 ) =
+    Random.float x1 x2
+        |> Random.andThen
+            (\xrand -> Random.map (\yrand -> ( xrand, yrand )) (Random.float y1 y2))
+
+
+randomMarker : ( Float, Float ) -> ( Float, Float ) -> Random.Generator ( MarkerType, Float, Float )
+randomMarker p1 p2 =
+    randomMarkerType |> Random.andThen (\t -> randomLatlng p1 p2 |> Random.andThen (\( x, y ) -> Random.constant ( t, x, y )))

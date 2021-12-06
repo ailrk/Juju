@@ -50,6 +50,8 @@ type Msg
     | AddMarker Marker
     | RemoveMarker Int
     | ToggleMarkerType
+    | Roll
+    | GenerateRandomMarkers ( MarkerType, Float, Float )
     | Clear
       -- navigation
     | LinkClicked Browser.UrlRequest

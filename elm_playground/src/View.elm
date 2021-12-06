@@ -28,6 +28,10 @@ body model =
                         , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Find Path" ]
                         , br [] []
                         , br [] []
+                        , h4 [] [ text "Generate Random Markers:  " ]
+                        , button [ style "margin-right" "5px", onClick Roll, class "btn btn-light" ] [ text "Generate" ]
+                        , br [] []
+                        , br [] []
                         , h4 [] [ text "Map Control:  " ]
                         , button [ style "margin-right" "5px", onClick (ZoomMap 1), class "btn btn-light" ] [ text "Zoom In" ]
                         , button [ onClick (ZoomMap -1), class "btn btn-light" ] [ text "Zoom Out" ]
@@ -41,12 +45,12 @@ body model =
         mapPanel =
             div [ class "col-md-8" ]
                 [ div [ class "panel panel-info" ]
-                    [ div [ class "panel-heading" ] [ text "State" ]
+                    [ div [ class "panel-heading" ] [ text "Map" ]
                     , div [ class "panel-body" ]
                         [ -- pre [] [ text (toString model) ]
-                          h4 [] [ text "Coordinates" ]
-                        , pre [] [ (text << toString) (List.map toString model.bounds) ]
-                        , div [ style "margin" "10px" ] []
+                          -- h4 [] [ text "Coordinates" ]
+                          -- , pre [] [ (text << toString) (List.map toString model.bounds) ]
+                          div [ style "margin" "10px" ] []
                         , div [ id "mapid" ] []
                         ]
                     ]
@@ -56,7 +60,7 @@ body model =
             div [ class "col-md-2" ]
                 [ div [ class "panel panel-info" ]
                     [ div [ class "panel-heading" ] [ text "Lists" ]
-                    , div [ class "panel-body" ]
+                    , div [ class "panel-body", style "height" "800px", style "overflow-y" "scroll" ]
                         [ h4 [] [ text "Marker Type:  ", text (toString model.markerMode) ]
                         , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Toggle Mode" ]
                         , addMarkers model
@@ -73,12 +77,15 @@ body model =
 
 addMarkers : Model -> Html Msg
 addMarkers model =
-    case model.markerMode of
-        Sink ->
-            ul [ style "margin-top" "10px" ] << List.map addMarker <| model.sinks
+    ul [ style "margin-top" "10px" ]
+        << List.map addMarker
+    <|
+        case model.markerMode of
+            Sink ->
+                model.sinks
 
-        Source ->
-            ul [ style "margin-top" "10px" ] << List.map addMarker <| model.sources
+            Source ->
+                model.sources
 
 
 
@@ -102,7 +109,9 @@ addMarker mk =
                 ]
                 [ text
                     (String.concat
-                        [ "Marker: "
+                        [ "Marker "
+                        , toString m.id
+                        , ": "
                         , toString m.lat
                         , ", "
                         , toString m.lng

@@ -14,25 +14,51 @@ port setBounds : (String -> msg) -> Sub msg
 port zoomMap : Int -> Cmd msg
 
 
+
+-- subscribe to the clicking event on map.
+
+
 port addMarker : (RawMarker -> msg) -> Sub msg
+
+
+
+-- actively push new markers to the model. Note it's a cmd.
+
+
+port pushMarker_ : ( String, Float, Float ) -> Cmd msg
+
+
+pushMarker : ( MarkerType, Float, Float ) -> Cmd msg
+pushMarker tup =
+    case tup of
+        ( Sink, x, y ) ->
+            pushMarker_ ( "sink", x, y )
+
+        ( Source, x, y ) ->
+            pushMarker_ ( "source", x, y )
 
 
 port removeMarker : Int -> Cmd msg
 
 
+port findPath : ( RawMarker, RawMarker ) -> Cmd msg
+
+
 port clearAll : () -> Cmd msg
+
+
 
 -- toggle the current marker type.
 
 
-port toggleMode : String -> Cmd msg
+port toggleMode_ : String -> Cmd msg
 
 
-toggleMode_ : MarkerType -> Cmd msg
-toggleMode_ t =
+toggleMode : MarkerType -> Cmd msg
+toggleMode t =
     case t of
         Sink ->
-            toggleMode "sink"
+            toggleMode_ "sink"
 
         Source ->
-            toggleMode "source"
+            toggleMode_ "source"
