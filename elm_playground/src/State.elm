@@ -3,7 +3,7 @@ module State exposing (..)
 import Browser.Navigation as Nav
 import Html.Attributes exposing (..)
 import String exposing (split)
-import Subs exposing (removeMarker, zoomMap)
+import Subs exposing (removeMarker, toggleMode_, zoomMap)
 import Types exposing (..)
 import Url
 
@@ -39,10 +39,10 @@ update msg model =
         ToggleMarkerType ->
             case model.markerMode of
                 Sink ->
-                    ( { model | markerMode = Source }, Cmd.none )
+                    ( { model | markerMode = Source }, toggleMode_ Source )
 
                 Source ->
-                    ( { model | markerMode = Sink }, Cmd.none )
+                    ( { model | markerMode = Sink }, toggleMode_ Sink )
 
         RemoveMarker int ->
             case model.markerMode of

@@ -18,40 +18,43 @@ view model =
 
 body : Model -> Html Msg
 body model =
-    div []
-        [ div [ class "col-md-2" ]
-            [ div [ class "panel panel-info" ]
-                [ div [ class "panel-heading" ] [ text "Contoller" ]
-                , div [ class "panel-body" ]
-                    [ h4 [] [ text "Coordinate Bound" ]
-                    , div [] (List.map addBound model.bounds)
-                    , div [ style "margin" "10px" ] []
-                    , h4 [] [ text "Marker Type:  ", text (toString model.markerMode) ]
-                    , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Toggle Mode" ]
-                    , br [] []
-                    , br [] []
-                    , h4 [] [ text "Map Control:  " ]
-                    , button [ style "margin-right" "5px", onClick (ZoomMap 1), class "btn btn-light" ] [ text "Zoom In" ]
-                    , button [ onClick (ZoomMap -1), class "btn btn-light" ] [ text "Zoom Out" ]
-                    , addMarkers model
+    let
+        controlPanel =
+            div [ class "col-md-2" ]
+                [ div [ class "panel panel-info" ]
+                    [ div [ class "panel-heading" ] [ text "Contoller" ]
+                    , div [ class "panel-body" ]
+                        [ h4 [] [ text "Find Path" ]
+                        , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Find Path" ]
+                        , br [] []
+                        , br [] []
+                        , h4 [] [ text "Marker Type:  ", text (toString model.markerMode) ]
+                        , button [ onClick ToggleMarkerType, class "btn btn-light", style "margin-right" "5px" ] [ text "Toggle Mode" ]
+                        , br [] []
+                        , br [] []
+                        , h4 [] [ text "Map Control:  " ]
+                        , button [ style "margin-right" "5px", onClick (ZoomMap 1), class "btn btn-light" ] [ text "Zoom In" ]
+                        , button [ onClick (ZoomMap -1), class "btn btn-light" ] [ text "Zoom Out" ]
+                        , addMarkers model
+                        ]
                     ]
                 ]
-            ]
-        , div [ class "col-md-8" ]
-            [ div [ class "panel panel-info" ]
-                [ div [ class "panel-heading" ] [ text "State" ]
-                , div [ class "panel-body" ]
-                    [ pre [] [ text (toString model) ]
-                    , div [ id "mapid" ] []
+
+        mapPanel =
+            div [ class "col-md-8" ]
+                [ div [ class "panel panel-info" ]
+                    [ div [ class "panel-heading" ] [ text "State" ]
+                    , div [ class "panel-body" ]
+                        [ pre [] [ text (toString model) ]
+                        , h4 [] [ text "Coordinates" ]
+                        , pre [] [ (text << toString) (List.map toString model.bounds) ]
+                        , div [ style "margin" "10px" ] []
+                        , div [ id "mapid" ] []
+                        ]
                     ]
                 ]
-            ]
-        ]
-
-
-addBound : Float -> Html Msg
-addBound bound =
-    div [] [ text (toString bound) ]
+    in
+    div [] [ controlPanel, mapPanel ]
 
 
 
@@ -105,7 +108,7 @@ addMarker mk =
     in
     li [ style "martin-botom" "20px" ]
         [ button
-            [ class "btn btn-ligth"
+            [ class "btn btn-light"
             , style "display" "inline-block"
             , style "margin-right" "5px"
             , onClick (RemoveMarker m.id)

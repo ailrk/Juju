@@ -18,3 +18,19 @@ port addMarker : (RawMarker -> msg) -> Sub msg
 
 
 port removeMarker : Int -> Cmd msg
+
+
+-- toggle the current marker type.
+
+
+port toggleMode : String -> Cmd msg
+
+
+toggleMode_ : MarkerType -> Cmd msg
+toggleMode_ t =
+    case t of
+        Sink ->
+            toggleMode "sink"
+
+        Source ->
+            toggleMode "source"
