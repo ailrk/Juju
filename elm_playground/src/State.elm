@@ -10,8 +10,7 @@ import Url
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ _ _ =
-    ( { num = 0
-      , msg = ""
+    ( { markerMode = Sink
       , sinks = []
       , sources = []
       , bounds = []
@@ -30,10 +29,28 @@ update msg model =
             ( model, zoomMap int )
 
         AddMarker marker ->
-            ( { model | sinks = marker :: model.sinks }, Cmd.none )
+            case marker of
+                Marker Sink _ ->
+                    ( { model | sinks = marker :: model.sinks }, Cmd.none )
+
+                Marker Source _ ->
+                    ( { model | sources = marker :: model.sources }, Cmd.none )
+
+        ToggleMarkerType ->
+            case model.markerMode of
+                Sink ->
+                    ( { model | markerMode = Source }, Cmd.none )
+
+                Source ->
+                    ( { model | markerMode = Sink }, Cmd.none )
 
         RemoveMarker int ->
-            ( { model | sinks = List.filter (\i -> i.id /= int) model.sinks }, removeMarker int )
+            case model.markerMode of
+                Sink ->
+                    ( { model | sinks = List.filter (\(Marker _ i) -> i.id /= int) model.sinks }, removeMarker int )
+
+                Source ->
+                    ( { model | sources = List.filter (\(Marker _ i) -> i.id /= int) model.sources }, removeMarker int )
 
         -- navigation
         UrlChanged _ ->
