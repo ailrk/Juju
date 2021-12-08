@@ -39,6 +39,7 @@ boot:
     ; segmentation. there is a LDT which is a local version of GDT being
     ; used to separate address space between multiple processes. e.g The
     ; os switch the current LDT when scheduling a new process.
+
     ; Today's os doesn't need LDT anymore because CPU itself already
     ; support paging direclty.
 
