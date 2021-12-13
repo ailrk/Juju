@@ -1,6 +1,8 @@
-    bits 16                     ; x86 real mode is 16 bit
-    org 0x7c00                  ; this bootloader start from 0x7c00.
 
+section .boot
+    bits 16                     ; x86 real mode is 16 bit
+    ; org 0x7c00                  ; this bootloader start from 0x7c00.
+    global boot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; boot : () -> !
 boot:
@@ -17,7 +19,7 @@ boot:
     ; memory.
     mov [disk], dl
     mov ah, 0x2                 ; read sectors
-    mov al, 1                   ; sector to read
+    mov al, 6                   ; sector to read
     mov ch, 0                   ; cylinder index
     mov dh, 0                   ; head index
     mov cl, 2                   ; sector index
@@ -109,9 +111,7 @@ dw 0xaa55                       ; magic word 0x55AA, little endian for x86.
 ; The second 512 sector
 copy_tgt:
 
-    ;
     ; entering 32 bit mode.
-    ;
     ; in protected mode we can't use bios anymore
     bits 32
 
@@ -119,7 +119,6 @@ copy_tgt:
 boot2:
     push msg
     call protected_mode_greet
-
     jmp halt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -155,7 +154,18 @@ bios_msg:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; end
 halt:
+    ; setup an initial C stack for C++ code.
+    mov esp, kernel_stack_top
+    extern kmain
+    call kmain
     cli
     hlt
 
 times 1024 - ($-$$) db 0           ; pad til 510 bytes
+
+section .bss
+align 4
+
+kernel_stack_bottom: equ $
+        resb 16384                 ; 16kb
+kernel_stack_top:
