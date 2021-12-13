@@ -8,8 +8,23 @@ boot:
 
     mov ax, 0x2401
     int 0x15                    ; enable A20 bit
+
     mov ax, 0x3
     int 0x10                    ; set VGA text mode to 0x3
+
+    ; BIOS only loads the first 512 bytes of the
+    ; boot sector. We need to mannually loadm more
+    ; memory.
+    mov [disk], dl
+    mov ah, 0x2                 ; read sectors
+    mov al, 1                   ; sector to read
+    mov ch, 0                   ; cylinder index
+    mov dh, 0                   ; head index
+    mov cl, 2                   ; sector index
+    mov dl, [disk]              ; disk index
+    mov bx, copy_tgt            ; target pointer
+    int 0x13                    ; call disk bios interrupt
+
     cli                         ; clean interrupt.
                                 ; enable 32 bit instructions
     lgdt [gdt_pointer]          ; load gdt table
@@ -68,8 +83,31 @@ gdt_end:
 gdt_pointer:
     dw gdt_end - gdt_null
     dd gdt_null
+disk:
+    db 0x0
 CODE_SEG equ gdt_code - gdt_null
 DATA_SEG equ gdt_data - gdt_null
+
+    ; bios_greet : () -> ()
+bios_greet:
+    mov si, bios_msg                ; point si to bios_msg
+    mov al, 0x0e                    ; set al to 0x0e to display character
+bios_greet_loop:
+    lodsb                           ; al = (*si)++
+    int 0x10                        ; print character
+    cmp al, 0                       ; while *al != '\0'
+    jne bios_greet_loop
+    ret
+
+msg:
+    db "[- msg from protected mode -]", 0
+
+times 510 - ($-$$) db 0           ; pad til 510 bytes
+dw 0xaa55                       ; magic word 0x55AA, little endian for x86.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; The second 512 sector
+copy_tgt:
 
     ;
     ; entering 32 bit mode.
@@ -84,7 +122,6 @@ boot2:
 
     jmp halt
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; protected_mode_greet : () -> ()
 protected_mode_greet:               ; can't use bios anymore. use VGA here.
@@ -93,7 +130,7 @@ protected_mode_greet:               ; can't use bios anymore. use VGA here.
     mov esi, [esp + 8]              ; address of the message
     mov ebx, 0xb8000                ; VGA text buffer starts at 0xb800
 
-
+                                    ; write to directed mapped VGA memory.
                                     ; VGA character are represented as
                                     ; |0               |8            16
                                     ; |bg clr |fg clr  |ascii char
@@ -109,24 +146,10 @@ protected_mode_greet_end:
     pop ebp
     ret
 
-    ; bios_greet : () -> ()
-bios_greet:
-    mov si, bios_msg                ; point si to bios_msg
-    mov al, 0x0e                    ; set al to 0x0e to display character
-bios_greet_loop:
-    lodsb                           ; al = (*si)++
-    int 0x10                        ; print character
-    cmp al, 0                       ; while *al != '\0'
-    jne bios_greet_loop
-    ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; define some data
 bios_msg:
     db "[- msg from bios 0x10 -]", 0
-
-msg:
-    db "[- msg from protected mode -]", 0
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -135,5 +158,4 @@ halt:
     cli
     hlt
 
-times 510-($-$$) db 0           ; pad til 510 bytes
-dw 0xAA55                       ; magic word 0x55AA, little endian for x86.
+times 1024 - ($-$$) db 0           ; pad til 510 bytes

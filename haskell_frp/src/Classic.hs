@@ -13,4 +13,6 @@ module Classic where
 --   Behavior: time-varying, reactive values.
 --   Events:   Set of conditions attached with possible extrainfo.
 
-
+type Time = Int
+type Behavior a =  Time -> a
+type Event a = [(Time, a)]
