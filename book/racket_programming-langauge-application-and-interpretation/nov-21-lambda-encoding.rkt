@@ -80,3 +80,5 @@
         (if (zero? n)
           1
           (* n (fct (sub1 n))))))))
+
+(fact2 10)
