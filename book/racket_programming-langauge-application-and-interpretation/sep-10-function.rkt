@@ -1,5 +1,9 @@
 #lang plai
 
+;; NOTE: this version isn't supposed to run.
+;;       just shows how functions should be defined.
+;;       the complete version is in sep-12
+
 ;; condition evaluates only one
 (define-type ExprC
   [numC (n number?)]
@@ -18,8 +22,9 @@
             (cdr head)
             (lookup-fundef f (cdr fds))))))
 
-; substitution is a textual operation, it doesn't take part in
-; actual interpretation of the meaning of the expression.
+; substitution is a textual operation, it doesn't take part in actual
+; interpretation of the meaning of the expression.
+
 ; subst : ExprC * symbol * ExprC -> ExprC
 (define (subst var parm body) '())
 
@@ -29,11 +34,12 @@
     [plusC (l r) (+ (interp l fds) (interp r fds))]
     [multC (l r) (* (interp l fds) (interp r fds))]
 
-    [idC (i) ()]
+    ; assume we don't have free variable,
+    [idC (_) (error _)]
+
+    [fundefC (p b) (error "fundec undefined")]
     [appC (f a) (local ((define the-f (lookup-fundef
                                        f fds)))
                   (subst (interp a fds)
-                         (fundef-param the-f)
-                         (fundef-body the-f)))]
-
-    ))
+                         (fundefC-param the-f)
+                         (fundefC-body the-f)))]))
