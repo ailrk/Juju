@@ -7,5 +7,5 @@ open Parser
 
 module AlgoW =
     let getJson value =
-        let json = JsonSerializer.Serialize(value)
+        let json = JsonSerializer.Serialize value
         value, json
