@@ -170,6 +170,3 @@ runFreeAST = foldFree interpFreeAST
     interpFreeAST (Output x next) = do
       putStrLn (show x)
       return $ next
-
-
-
